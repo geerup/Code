@@ -1,0 +1,11 @@
+{
+  "name": "npc-dialogue-engine",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Reusable branching NPC dialogue engine with optional LLM free-talk.",
+  "scripts": {
+    "test": "node --test",
+    "serve": "python3 -m http.server 8085"
+  }
+}

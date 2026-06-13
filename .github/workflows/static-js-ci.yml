@@ -3,6 +3,7 @@ on:
   push:
     paths:
       - 'projects/03-generative-art-playground/**'
+      - 'projects/14-npc-dialogue/**'
       - 'projects/17-procedural-dungeon/web/**'
       - 'projects/19-retro-arcade/**'
       - 'projects/20-shader-gallery/**'
@@ -16,6 +17,7 @@ jobs:
       matrix:
         project:
           - projects/03-generative-art-playground
+          - projects/14-npc-dialogue
           - projects/17-procedural-dungeon/web
           - projects/19-retro-arcade
           - projects/20-shader-gallery

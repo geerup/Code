@@ -3,7 +3,9 @@ on:
   push:
     paths:
       - 'projects/05-agentic-task-runner/**'
+      - 'projects/07-ai-games-bridge/**'
       - 'projects/11-eval-harness/**'
+      - 'projects/12-multi-agent-research/**'
       - 'projects/13-chat-bot/**'
       - 'projects/16-semantic-code-search/**'
       - '.github/workflows/python-ci.yml'
@@ -15,7 +17,9 @@ jobs:
       matrix:
         project:
           - projects/05-agentic-task-runner
+          - projects/07-ai-games-bridge
           - projects/11-eval-harness
+          - projects/12-multi-agent-research
           - projects/13-chat-bot
           - projects/16-semantic-code-search
     steps:

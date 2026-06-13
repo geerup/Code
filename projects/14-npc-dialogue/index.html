@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NPC Dialogue Engine</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; font-family: ui-sans-serif, system-ui, sans-serif; background: #0a0a0f; color: #e8e8ef; display: grid; place-items: center; min-height: 100vh; }
+  .box { width: min(560px, 92vw); background: #12121b; border: 1px solid #2a2a38; border-radius: 14px; padding: 22px; }
+  h1 { font-size: 16px; margin-top: 0; }
+  .npc { background: #1b1b27; border-radius: 10px; padding: 14px; margin: 12px 0; font-size: 15px; }
+  .npc .who { color: #5bc0be; font-weight: 600; font-size: 12px; text-transform: uppercase; }
+  button { display: block; width: 100%; text-align: left; margin: 6px 0; background: #16161f; color: #ddd; border: 1px solid #33333f; border-radius: 8px; padding: 10px 12px; cursor: pointer; font-size: 14px; }
+  button:hover { border-color: #5bc0be; }
+  .vars { font-size: 11px; color: #777; margin-top: 10px; }
+</style>
+</head>
+<body>
+<div class="box">
+  <h1>🗣️ NPC Dialogue Engine</h1>
+  <div class="npc"><div class="who" id="who">Guard</div><div id="text"></div></div>
+  <div id="choices"></div>
+  <div class="vars" id="vars"></div>
+</div>
+<script type="module">
+  import { DialogueEngine } from './src/dialogue.js';
+  const graph = {
+    start: 'greet',
+    nodes: {
+      greet: { text: 'Halt! Who goes there?', choices: [
+        { label: '“A friend.”', to: 'friendly', set: { trust: 1 } },
+        { label: '“None of your business.”', to: 'hostile' },
+        { label: '🪙 Offer a bribe (10g)', to: 'bribed', set: { gold: -10 }, requires: { var: 'gold', op: '>=', value: 10 } },
+      ]},
+      friendly: { text: 'Well met, traveler. Pass freely.', choices: [{ label: 'Continue on', to: null }] },
+      hostile: { text: 'Then you shall not pass!', choices: [{ label: 'Back away', to: null }] },
+      bribed: { text: '*pockets the coin* …I saw nothing.', choices: [{ label: 'Slip past', to: null }] },
+    },
+  };
+  let engine = new DialogueEngine(graph, { gold: 25 });
+
+  function render() {
+    document.getElementById('text').textContent = engine.node()?.text ?? '— end of conversation —';
+    const choicesEl = document.getElementById('choices');
+    choicesEl.innerHTML = '';
+    if (engine.ended()) {
+      const again = document.createElement('button');
+      again.textContent = '↺ Start over';
+      again.onclick = () => { engine = new DialogueEngine(graph, { gold: 25 }); render(); };
+      choicesEl.appendChild(again);
+    } else {
+      engine.availableChoices().forEach((c, i) => {
+        const b = document.createElement('button');
+        b.textContent = c.label;
+        b.onclick = () => { engine.choose(i); render(); };
+        choicesEl.appendChild(b);
+      });
+    }
+    document.getElementById('vars').textContent = 'state: ' + JSON.stringify(engine.vars);
+  }
+  render();
+</script>
+</body>
+</html>
