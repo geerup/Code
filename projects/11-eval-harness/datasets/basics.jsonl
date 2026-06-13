@@ -1,0 +1,5 @@
+{"id": "cap-france", "prompt": "What is the capital of France? Answer with one word.", "expected": "Paris", "metric": "contains"}
+{"id": "math-1", "prompt": "What is 17 * 3?", "expected": "51", "metric": "numeric"}
+{"id": "greeting", "prompt": "Say hello to the world.", "expected": "hello world", "metric": "f1"}
+{"id": "color-sky", "prompt": "What color is a clear daytime sky? One word.", "expected": "blue", "metric": "contains"}
+{"id": "explain", "prompt": "In one sentence, what is recursion?", "expected": "a function that calls itself", "metric": "judge"}

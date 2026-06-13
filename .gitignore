@@ -26,3 +26,8 @@ npm-debug.log*
 .DS_Store
 .idea/
 .vscode/
+__pycache__/
+*.pyc
+report.json
+report.html
+*.index.json
