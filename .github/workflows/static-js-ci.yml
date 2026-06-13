@@ -11,6 +11,7 @@ on:
       - 'projects/21-level-editor/**'
       - 'projects/23-game-jam/**'
       - 'projects/28-data-dashboard/**'
+      - 'projects/30-portfolio-capstone/**'
       - '.github/workflows/static-js-ci.yml'
   pull_request:
 jobs:
@@ -28,6 +29,7 @@ jobs:
           - projects/21-level-editor
           - projects/23-game-jam
           - projects/28-data-dashboard
+          - projects/30-portfolio-capstone
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

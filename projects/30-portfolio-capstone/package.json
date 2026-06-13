@@ -1,0 +1,11 @@
+{
+  "name": "portfolio-capstone",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "The front-door index site for all 30 portfolio projects.",
+  "scripts": {
+    "test": "node --test",
+    "serve": "python3 -m http.server 8089"
+  }
+}

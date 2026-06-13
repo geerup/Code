@@ -2,6 +2,7 @@ name: go-ci
 on:
   push:
     paths:
+      - 'projects/01-social-app/**'
       - 'projects/02-multiplayer-arena/**'
       - 'projects/06-code-review-cli/**'
       - 'projects/08-vector-search/**'
@@ -9,6 +10,7 @@ on:
       - 'projects/24-kv-store/**'
       - 'projects/25-message-queue/**'
       - 'projects/26-rate-limiter/**'
+      - 'projects/29-saas-starter/**'
       - '.github/workflows/go-ci.yml'
   pull_request:
 jobs:
@@ -17,6 +19,7 @@ jobs:
     strategy:
       matrix:
         module:
+          - projects/01-social-app
           - projects/02-multiplayer-arena
           - projects/06-code-review-cli
           - projects/08-vector-search
@@ -24,6 +27,7 @@ jobs:
           - projects/24-kv-store
           - projects/25-message-queue
           - projects/26-rate-limiter
+          - projects/29-saas-starter
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5

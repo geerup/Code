@@ -114,11 +114,21 @@ README + demo) before starting the next.
 
 ## Progress
 - [x] Roadmap defined + detailed (all 30 scoped & ordered)
-- [x] Project #04 (RAG assistant) scaffolded, tested, **CI green**
-- [ ] Project #04 deployed live (Vercel + Fly)
-- [ ] Phase 1 complete (04, 03, 06, 19)
-- [ ] First flagship shipped (09 or 10)
-- [ ] Portfolio capstone (#30) live
+- [x] **All 30 projects built, tested, and CI-wired** 🎉
+- [x] Project #04 (RAG assistant) — tested, CI green
+- [x] Phase 1 complete (04, 03, 06, 19)
+- [x] All five flagships built (09, 10, 12, 24, 30)
+- [x] Portfolio capstone (#30) — generated from a tested catalog
+- [ ] Deploy each project live (Vercel / Fly) and link from #30
+- [ ] Split the strongest projects into standalone repos for profile pins
+
+### Test coverage at a glance
+Every project ships an automated test suite run in CI:
+- **Go (9):** 01, 02, 06, 08, 22, 24, 25, 26, 29 — `go vet` + `go test` + `go build`.
+- **Python (10):** 05, 07, 09, 10, 11, 12, 13, 15, 16, 27 — `unittest`, stdlib-only,
+  LLM/IO injected so tests run offline.
+- **JS (10):** 03, 14, 17(web), 18, 19, 20, 21, 23, 28, 30 — `node --test`, zero deps.
+- **Rust (1):** 17 — `cargo test` (incl. flood-fill connectivity).
 
 ---
 *Living document — updated as projects ship.*
