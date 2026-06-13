@@ -1,0 +1,32 @@
+# Fly.io config for the RAG backend.
+# Deploy:  fly launch --no-deploy  (first time, to create the app)
+#          fly volumes create rag_data --size 1
+#          fly secrets set OLLAMA_HOST=https://your-ollama-host
+#          fly deploy
+app = "rag-knowledge-assistant"
+primary_region = "iad"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  RAG_DB_PATH = "/data/rag.db"
+  LLM_PROVIDER = "ollama"
+  EMBED_PROVIDER = "ollama"
+
+[[mounts]]
+  source = "rag_data"
+  destination = "/data"
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+
+[[http_service.checks]]
+  method = "GET"
+  path = "/health"
+  interval = "30s"
+  timeout = "5s"

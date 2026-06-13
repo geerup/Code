@@ -25,7 +25,7 @@ with CI, tests, and a real README.
 | 1 | Niche real-time social app | Social/full-stack | Next.js/TS + Postgres | Planned |
 | 2 | Real-time multiplayer mini-game | Games | Go + TS | Planned |
 | 3 | Generative-art / procedural-gen playground | Creative | Rust + WASM | Planned |
-| 4 | RAG knowledge assistant | AI | Python + TS | Planned |
+| 4 | [RAG knowledge assistant](./projects/04-rag-knowledge-assistant) | AI | Python + TS | ✅ MVP shipped |
 | 5 | Agentic task runner | AI | Python | Planned |
 | 6 | LLM code-review CLI | AI/systems | Go or Rust | Planned |
 | 7 | AI + games bridge tool (describe → playable) | AI/games | Python/TS | Planned |
@@ -52,7 +52,8 @@ Target mix: **~25 small/medium + ~5 flagships**.
 
 ## Progress
 - [x] Roadmap defined
-- [ ] Project #1 scaffolded & deployed
+- [x] First project (#4 RAG assistant) scaffolded, tested, CI-ready
+- [ ] First project deployed live (Vercel + Fly)
 - [ ] First flagship shipped
 - [ ] Portfolio index site live
 

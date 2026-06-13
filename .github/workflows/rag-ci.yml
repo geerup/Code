@@ -1,0 +1,56 @@
+name: RAG Knowledge Assistant CI
+
+on:
+  push:
+    branches: ["**"]
+    paths:
+      - "projects/04-rag-knowledge-assistant/**"
+      - ".github/workflows/rag-ci.yml"
+  pull_request:
+    paths:
+      - "projects/04-rag-knowledge-assistant/**"
+      - ".github/workflows/rag-ci.yml"
+
+defaults:
+  run:
+    working-directory: projects/04-rag-knowledge-assistant
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install backend
+        working-directory: projects/04-rag-knowledge-assistant/backend
+        run: pip install . ".[dev]"
+      - name: Lint (ruff)
+        working-directory: projects/04-rag-knowledge-assistant/backend
+        run: ruff check .
+      - name: Test (pytest)
+        working-directory: projects/04-rag-knowledge-assistant/backend
+        env:
+          LLM_PROVIDER: fake
+          EMBED_PROVIDER: fake
+        run: python -m pytest -q
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: projects/04-rag-knowledge-assistant/frontend/package-lock.json
+      - name: Install frontend
+        working-directory: projects/04-rag-knowledge-assistant/frontend
+        run: npm ci
+      - name: Typecheck
+        working-directory: projects/04-rag-knowledge-assistant/frontend
+        run: npm run typecheck
+      - name: Build
+        working-directory: projects/04-rag-knowledge-assistant/frontend
+        run: npm run build
