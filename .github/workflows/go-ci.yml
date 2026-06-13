@@ -4,7 +4,11 @@ on:
     paths:
       - 'projects/02-multiplayer-arena/**'
       - 'projects/06-code-review-cli/**'
+      - 'projects/08-vector-search/**'
       - 'projects/22-leaderboard-service/**'
+      - 'projects/24-kv-store/**'
+      - 'projects/25-message-queue/**'
+      - 'projects/26-rate-limiter/**'
       - '.github/workflows/go-ci.yml'
   pull_request:
 jobs:
@@ -15,7 +19,11 @@ jobs:
         module:
           - projects/02-multiplayer-arena
           - projects/06-code-review-cli
+          - projects/08-vector-search
           - projects/22-leaderboard-service
+          - projects/24-kv-store
+          - projects/25-message-queue
+          - projects/26-rate-limiter
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
