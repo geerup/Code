@@ -1,0 +1,26 @@
+name: static-js-ci
+on:
+  push:
+    paths:
+      - 'projects/03-generative-art-playground/**'
+      - 'projects/19-retro-arcade/**'
+      - 'projects/20-shader-gallery/**'
+      - '.github/workflows/static-js-ci.yml'
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project:
+          - projects/03-generative-art-playground
+          - projects/19-retro-arcade
+          - projects/20-shader-gallery
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test ${{ matrix.project }}
+        working-directory: ${{ matrix.project }}
+        run: node --test
