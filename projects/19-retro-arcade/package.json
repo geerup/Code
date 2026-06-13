@@ -1,0 +1,11 @@
+{
+  "name": "gravity-snake",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Snake with a twist — every apple flips gravity. Canvas, zero deps.",
+  "scripts": {
+    "test": "node --test",
+    "serve": "python3 -m http.server 8081"
+  }
+}

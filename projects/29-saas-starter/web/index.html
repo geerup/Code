@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SaaS Starter</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; font-family: ui-sans-serif, system-ui, sans-serif; background: #0a0a0f; color: #e8e8ef; }
+  .app { max-width: 760px; margin: 0 auto; padding: 20px; }
+  h1 { font-size: 19px; }
+  input, button { font-size: 14px; border-radius: 8px; padding: 9px 12px; }
+  input { background: #16161f; color: #eee; border: 1px solid #33333f; }
+  button { background: #5bc0be; color: #06121a; border: 0; font-weight: 600; cursor: pointer; }
+  .row { display: flex; gap: 8px; margin: 8px 0; flex-wrap: wrap; }
+  .plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-top: 16px; }
+  .plan { background: #12121b; border: 1px solid #2a2a38; border-radius: 12px; padding: 16px; }
+  .plan h3 { margin: 0; } .price { font-size: 26px; font-weight: 700; margin: 8px 0; }
+  .plan ul { padding-left: 18px; font-size: 13px; color: #bbb; }
+  .badge { display: inline-block; background: #1b1b27; color: #5bc0be; border-radius: 6px; padding: 2px 8px; font-size: 12px; }
+  .muted { color: #777; font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <h1>🚀 SaaS Starter <span class="muted">— auth + subscription billing</span></h1>
+  <div id="auth">
+    <div class="row"><input id="email" placeholder="email" /><input id="pass" type="password" placeholder="password" />
+      <button id="register">Sign up</button>
+      <button id="login" style="background:#16161f;color:#ccc;border:1px solid #33333f">Log in</button></div>
+  </div>
+  <div id="account" style="display:none">
+    <p>Signed in. Current plan: <span class="badge" id="curplan">—</span> · features: <span id="features" class="muted"></span></p>
+  </div>
+  <div class="plans" id="plans"></div>
+  <p class="muted">Billing is simulated (fake gateway). Subscribing sets status <code>past_due</code>; a <code>/api/webhook</code> "invoice.paid" event activates it — exactly how Stripe webhooks drive real subscription state.</p>
+</div>
+<script>
+  let token = null, lastStripeId = null;
+  const api = (p, m, b) => fetch('/api' + p, { method: m || 'GET', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) }, body: b ? JSON.stringify(b) : undefined }).then(r => r.json());
+
+  document.getElementById('register').onclick = () => authCall('/register');
+  document.getElementById('login').onclick = () => authCall('/login');
+  async function authCall(path) {
+    const r = await api(path, 'POST', { email: email.value, password: pass.value });
+    if (r.token) { token = r.token; document.getElementById('auth').style.display = 'none'; document.getElementById('account').style.display = 'block'; refresh(); }
+    else alert(r.error || 'failed');
+  }
+  async function refresh() {
+    const me = await api('/me');
+    document.getElementById('curplan').textContent = me.plan.name + ' (' + me.subscription.status + ')';
+    document.getElementById('features').textContent = (me.features || []).join(', ');
+  }
+  async function subscribe(plan) {
+    if (!token) return alert('Sign up first.');
+    const sub = await api('/subscribe', 'POST', { plan });
+    lastStripeId = sub.stripe_id;
+    // Simulate the provider confirming payment via webhook.
+    await api('/webhook', 'POST', { type: 'invoice.paid', stripe_id: lastStripeId });
+    refresh();
+  }
+  window.subscribe = subscribe;
+  fetch('/api/plans').then(r => r.json()).then(plans => {
+    document.getElementById('plans').innerHTML = Object.values(plans).map(p => `
+      <div class="plan"><h3>${p.name}</h3><div class="price">$${p.price_usd}<span class="muted">/mo</span></div>
+        <ul>${p.features.map(f => '<li>' + f + '</li>').join('')}</ul>
+        <button onclick="subscribe('${p.id}')">Choose ${p.name}</button></div>`).join('');
+  });
+</script>
+</body>
+</html>

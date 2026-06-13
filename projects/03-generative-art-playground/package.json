@@ -1,0 +1,11 @@
+{
+  "name": "generative-art-playground",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Seedable, shareable generative-art toy (Canvas, zero dependencies).",
+  "scripts": {
+    "test": "node --test",
+    "serve": "python3 -m http.server 8080"
+  }
+}

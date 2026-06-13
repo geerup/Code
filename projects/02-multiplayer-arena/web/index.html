@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Coin Arena</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; font-family: ui-sans-serif, system-ui, sans-serif; background: #0a0a0f; color: #eee; display: grid; place-items: center; min-height: 100vh; }
+  .wrap { text-align: center; }
+  h1 { font-size: 17px; }
+  canvas { background: #0d1117; border-radius: 10px; box-shadow: 0 10px 40px rgba(0,0,0,.5); }
+  .hint { font-size: 12px; color: #888; }
+  #status { font-size: 13px; color: #5bc0be; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🪙 Coin Arena — real-time multiplayer</h1>
+  <div id="status">connecting…</div>
+  <canvas id="c" width="900" height="600"></canvas>
+  <p class="hint">WASD / arrow keys to move. Open this page in two tabs to see live multiplayer.</p>
+</div>
+<script>
+  const c = document.getElementById('c'), ctx = c.getContext('2d');
+  const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+  const ws = new WebSocket(`${proto}://${location.host}/ws?name=player`);
+  let myId = null, world = null;
+
+  ws.onopen = () => { document.getElementById('status').textContent = 'connected'; };
+  ws.onclose = () => { document.getElementById('status').textContent = 'disconnected'; };
+  ws.onmessage = (e) => {
+    const msg = JSON.parse(e.data);
+    if (msg.type === 'hello') myId = msg.id;
+    else if (msg.type === 'state') world = msg.world;
+  };
+
+  const keys = {};
+  addEventListener('keydown', (e) => { keys[e.key.toLowerCase()] = true; sendInput(); });
+  addEventListener('keyup', (e) => { keys[e.key.toLowerCase()] = false; sendInput(); });
+  function sendInput() {
+    if (ws.readyState !== 1) return;
+    let dx = 0, dy = 0;
+    if (keys['a'] || keys['arrowleft']) dx -= 1;
+    if (keys['d'] || keys['arrowright']) dx += 1;
+    if (keys['w'] || keys['arrowup']) dy -= 1;
+    if (keys['s'] || keys['arrowdown']) dy += 1;
+    ws.send(JSON.stringify({ dx, dy }));
+  }
+
+  function draw() {
+    ctx.fillStyle = '#0d1117'; ctx.fillRect(0, 0, c.width, c.height);
+    if (world) {
+      ctx.fillStyle = '#e9c46a';
+      for (const coin of world.coins) { ctx.beginPath(); ctx.arc(coin.pos.x, coin.pos.y, 8, 0, 7); ctx.fill(); }
+      for (const id in world.players) {
+        const p = world.players[id];
+        ctx.fillStyle = id === myId ? '#5bc0be' : '#e76f51';
+        ctx.beginPath(); ctx.arc(p.pos.x, p.pos.y, 12, 0, 7); ctx.fill();
+        ctx.fillStyle = '#fff'; ctx.font = '12px system-ui'; ctx.textAlign = 'center';
+        ctx.fillText(`${p.name} (${p.score})`, p.pos.x, p.pos.y - 18);
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+</script>
+</body>
+</html>

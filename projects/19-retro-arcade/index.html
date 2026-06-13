@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Gravity Snake</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center;
+    font-family: ui-monospace, monospace; background: #07080d; color: #c7f9cc; }
+  .wrap { text-align: center; }
+  h1 { font-size: 18px; letter-spacing: 2px; }
+  canvas { background: #0d1117; border: 2px solid #1f6f54; border-radius: 8px; image-rendering: pixelated; }
+  .hud { display: flex; justify-content: space-between; font-size: 13px; margin: 8px 4px; }
+  .msg { height: 20px; color: #ffd166; font-size: 13px; }
+  button { margin-top: 10px; background: #1f6f54; color: #c7f9cc; border: 0; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-family: inherit; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🐍 GRAVITY SNAKE</h1>
+  <div class="hud"><span>SCORE <b id="score">0</b></span><span>GRAVITY <b id="grav">→</b></span></div>
+  <canvas id="c" width="400" height="400"></canvas>
+  <div class="msg" id="msg">Arrow keys / WASD. Each apple flips gravity.</div>
+  <button id="restart">Restart</button>
+</div>
+<script type="module">
+  import { createGame, turn, step } from './src/game.js';
+  const COLS = 20, ROWS = 20, CELL = 20;
+  const c = document.getElementById('c');
+  const ctx = c.getContext('2d');
+  const arrows = { up: '↑', down: '↓', left: '←', right: '→' };
+  let game = createGame(COLS, ROWS);
+
+  const keymap = {
+    ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right',
+    w: 'up', s: 'down', a: 'left', d: 'right',
+  };
+  addEventListener('keydown', (e) => {
+    const dir = keymap[e.key];
+    if (dir) { turn(game, dir); e.preventDefault(); }
+  });
+  document.getElementById('restart').onclick = () => { game = createGame(COLS, ROWS); };
+
+  function draw() {
+    ctx.fillStyle = '#0d1117';
+    ctx.fillRect(0, 0, c.width, c.height);
+    if (game.apple) {
+      ctx.fillStyle = '#ff4d6d';
+      ctx.fillRect(game.apple.x * CELL + 2, game.apple.y * CELL + 2, CELL - 4, CELL - 4);
+    }
+    game.snake.forEach((s, i) => {
+      ctx.fillStyle = i === 0 ? '#80ffdb' : '#43aa8b';
+      ctx.fillRect(s.x * CELL + 1, s.y * CELL + 1, CELL - 2, CELL - 2);
+    });
+    document.getElementById('score').textContent = game.score;
+    document.getElementById('grav').textContent = arrows[game.gravity];
+    document.getElementById('msg').textContent = game.over
+      ? `GAME OVER — score ${game.score}. Press Restart.`
+      : 'Arrow keys / WASD. Each apple flips gravity.';
+  }
+
+  let acc = 0, last = 0;
+  function loop(t) {
+    acc += t - last; last = t;
+    if (acc > 120) { acc = 0; if (!game.over) step(game); }
+    draw();
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame((t) => { last = t; loop(t); });
+</script>
+</body>
+</html>

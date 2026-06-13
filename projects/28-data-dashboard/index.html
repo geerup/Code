@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Live Data Dashboard</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; font-family: ui-sans-serif, system-ui, sans-serif; background: #0a0a0f; color: #e8e8ef; padding: 18px; }
+  h1 { font-size: 17px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
+  .card { background: #12121b; border: 1px solid #2a2a38; border-radius: 12px; padding: 14px; }
+  .card h2 { font-size: 13px; margin: 0 0 8px; color: #5bc0be; text-transform: uppercase; letter-spacing: .5px; }
+  .stat { font-size: 12px; color: #aaa; }
+  canvas { width: 100%; height: 120px; display: block; }
+  .hint { font-size: 12px; color: #777; }
+</style>
+</head>
+<body>
+<h1>📈 Live Data Dashboard</h1>
+<p class="hint">Streaming simulated metrics (swap the source for a real WebSocket — the data core is identical).</p>
+<div class="grid" id="grid"></div>
+<script type="module">
+  import { Dashboard } from './src/timeseries.js';
+  const COLORS = { cpu: '#5bc0be', latency: '#e9c46a', requests: '#e76f51', errors: '#ef476f' };
+  const dash = new Dashboard(300);
+  const cards = {};
+
+  function ensureCard(metric) {
+    if (cards[metric]) return cards[metric];
+    const el = document.createElement('div');
+    el.className = 'card';
+    el.innerHTML = `<h2>${metric}</h2><canvas></canvas><div class="stat"></div>`;
+    document.getElementById('grid').appendChild(el);
+    const canvas = el.querySelector('canvas');
+    canvas.width = el.clientWidth - 28; canvas.height = 120;
+    cards[metric] = { canvas, ctx: canvas.getContext('2d'), stat: el.querySelector('.stat') };
+    return cards[metric];
+  }
+
+  function draw(metric) {
+    const card = ensureCard(metric);
+    const series = dash.get(metric);
+    const pts = series.downsample(card.canvas.width);
+    const s = series.stats(30000);
+    const { ctx, canvas } = card;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const min = s.min, max = s.max || 1, range = (max - min) || 1;
+    ctx.strokeStyle = COLORS[metric] || '#8ab';
+    ctx.lineWidth = 1.5; ctx.beginPath();
+    pts.forEach((p, i) => {
+      const x = (i / (pts.length - 1 || 1)) * canvas.width;
+      const y = canvas.height - ((p.v - min) / range) * (canvas.height - 8) - 4;
+      i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+    });
+    ctx.stroke();
+    card.stat.textContent = `last ${s.last.toFixed(1)} · avg ${s.avg.toFixed(1)} · min ${s.min.toFixed(1)} · max ${s.max.toFixed(1)}`;
+  }
+
+  // Simulated stream — replace with `new WebSocket(url).onmessage` in production.
+  const state = { cpu: 30, latency: 80, requests: 200, errors: 2 };
+  setInterval(() => {
+    const now = Date.now();
+    state.cpu = clamp(state.cpu + rnd(8), 0, 100);
+    state.latency = clamp(state.latency + rnd(20), 10, 400);
+    state.requests = clamp(state.requests + rnd(40), 0, 1000);
+    state.errors = clamp(state.errors + rnd(2), 0, 50);
+    for (const m of Object.keys(state)) {
+      dash.ingest({ metric: m, t: now, v: state[m] });
+      draw(m);
+    }
+  }, 250);
+  function rnd(s) { return (Math.random() - 0.5) * s; }
+  function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+</script>
+</body>
+</html>

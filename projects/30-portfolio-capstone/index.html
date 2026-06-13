@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>30 Projects — Portfolio</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: ui-sans-serif, system-ui, sans-serif; background: #0a0a0f; color: #e8e8ef; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 28px 20px 60px; }
+  header h1 { font-size: 26px; margin: 0 0 6px; }
+  header p { color: #9aa; margin: 0 0 18px; max-width: 680px; line-height: 1.5; }
+  .summary { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; }
+  .chip { background: #12121b; border: 1px solid #2a2a38; border-radius: 999px; padding: 6px 12px; font-size: 13px; color: #cde; }
+  .chip b { color: #5bc0be; }
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+  .filters button { background: #16161f; color: #ccc; border: 1px solid #33333f; border-radius: 8px; padding: 7px 13px; cursor: pointer; font-size: 13px; }
+  .filters button.active { background: #5bc0be; color: #06121a; font-weight: 600; border-color: #5bc0be; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+  .card { background: #12121b; border: 1px solid #2a2a38; border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 8px; transition: border-color .15s, transform .15s; text-decoration: none; color: inherit; }
+  .card:hover { border-color: #5bc0be; transform: translateY(-2px); }
+  .card .top { display: flex; justify-content: space-between; align-items: baseline; }
+  .card .num { font-size: 12px; color: #667; }
+  .card h3 { margin: 0; font-size: 16px; }
+  .card .blurb { font-size: 13px; color: #aab; line-height: 1.45; flex: 1; }
+  .card .meta { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tag { font-size: 11px; border-radius: 6px; padding: 2px 7px; background: #1b1b27; color: #9bd; }
+  .tag.theme { color: #e9c46a; }
+  .tag.flag { background: #3a2d12; color: #ffd166; }
+  .tag.shipped { background: #12331f; color: #6fdc8c; }
+  footer { margin-top: 28px; color: #667; font-size: 12px; }
+  a.code { color: #5bc0be; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🗂️ 30 Projects</h1>
+    <p>A deliberate path into an <b>AI/ML + full-stack</b> career, weighted toward
+       <b>AI agents/LLM apps</b> and <b>games/creative</b>. Every project ships with
+       tests and CI; flagships go deep. This page is generated from a single,
+       unit-tested catalog.</p>
+    <div class="summary" id="summary"></div>
+  </header>
+  <div class="filters" id="filters"></div>
+  <div class="grid" id="grid"></div>
+  <footer>
+    Built across one monorepo · each card links to the project's source &amp; README.
+    Replace links with live demo URLs as each deploys.
+  </footer>
+</div>
+<script type="module">
+  import { PROJECTS, THEMES, themeCounts, filterProjects } from './src/catalog.js';
+
+  // Link target: sibling project folder in the repo. Swap for live URLs on deploy.
+  const hrefFor = (p) => `../${p.slug}/`;
+  let active = 'All';
+
+  const counts = themeCounts();
+  document.getElementById('summary').innerHTML =
+    `<span class="chip"><b>${PROJECTS.length}</b> projects</span>` +
+    `<span class="chip"><b>5</b> flagships</span>` +
+    THEMES.map((t) => `<span class="chip">${t} <b>${counts[t]}</b></span>`).join('');
+
+  const filters = ['All', ...THEMES, 'Flagships'];
+  const fc = document.getElementById('filters');
+  fc.innerHTML = filters.map((f) => `<button data-f="${f}">${f}</button>`).join('');
+  fc.addEventListener('click', (e) => {
+    if (!e.target.dataset.f) return;
+    active = e.target.dataset.f; render();
+  });
+
+  function render() {
+    [...fc.children].forEach((b) => b.classList.toggle('active', b.dataset.f === active));
+    const list = active === 'Flagships'
+      ? filterProjects({ flagshipOnly: true })
+      : filterProjects({ theme: active });
+    document.getElementById('grid').innerHTML = list.map((p) => `
+      <a class="card" href="${hrefFor(p)}">
+        <div class="top"><h3>${p.name}</h3><span class="num">#${String(p.id).padStart(2, '0')}</span></div>
+        <div class="blurb">${p.blurb}</div>
+        <div class="meta">
+          <span class="tag theme">${p.theme}</span>
+          <span class="tag">${p.stack}</span>
+          ${p.flagship ? '<span class="tag flag">★ flagship</span>' : ''}
+          ${p.status === 'shipped' ? '<span class="tag shipped">shipped</span>' : ''}
+        </div>
+      </a>`).join('');
+  }
+  render();
+</script>
+</body>
+</html>

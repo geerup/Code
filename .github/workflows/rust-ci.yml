@@ -1,0 +1,22 @@
+name: rust-ci
+on:
+  push:
+    paths:
+      - 'projects/17-procedural-dungeon/**'
+      - '.github/workflows/rust-ci.yml'
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        crate:
+          - projects/17-procedural-dungeon
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Test ${{ matrix.crate }}
+        working-directory: ${{ matrix.crate }}
+        run: |
+          cargo build --release
+          cargo test

@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Shader Gallery</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; font-family: ui-sans-serif, system-ui, sans-serif; background: #000; color: #eee; overflow: hidden; }
+  canvas { display: block; width: 100vw; height: 100vh; }
+  .panel { position: fixed; top: 14px; left: 14px; background: rgba(10,10,16,.7);
+    backdrop-filter: blur(8px); padding: 12px 14px; border-radius: 12px; border: 1px solid #2a2a38; }
+  h1 { font-size: 14px; margin: 0 0 8px; }
+  button { display: block; width: 100%; text-align: left; margin: 4px 0; background: #16161f;
+    color: #ddd; border: 1px solid #33333f; border-radius: 8px; padding: 7px 12px; cursor: pointer; font-size: 13px; }
+  button.active { background: #5bc0be; color: #06121a; border-color: #5bc0be; font-weight: 600; }
+  .err { position: fixed; bottom: 12px; left: 14px; color: #ff6b6b; font-size: 12px; font-family: monospace; }
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+<div class="panel"><h1>✨ Shader Gallery</h1><div id="buttons"></div></div>
+<div class="err" id="err"></div>
+<script type="module">
+  import { SHADERS, VERTEX_SRC, wrapFragment, getShader } from './src/shaders.js';
+  const canvas = document.getElementById('gl');
+  const gl = canvas.getContext('webgl');
+  const errEl = document.getElementById('err');
+  if (!gl) errEl.textContent = 'WebGL not supported in this browser.';
+
+  function compile(type, src) {
+    const sh = gl.createShader(type);
+    gl.shaderSource(sh, src);
+    gl.compileShader(sh);
+    if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS))
+      throw new Error(gl.getShaderInfoLog(sh));
+    return sh;
+  }
+
+  let program, uTime, uRes, current = SHADERS[0].id;
+  function useShader(id) {
+    current = id;
+    errEl.textContent = '';
+    try {
+      const prog = gl.createProgram();
+      gl.attachShader(prog, compile(gl.VERTEX_SHADER, VERTEX_SRC));
+      gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, wrapFragment(getShader(id).body)));
+      gl.linkProgram(prog);
+      if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(prog));
+      program = prog;
+      gl.useProgram(program);
+      const buf = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+      const loc = gl.getAttribLocation(program, 'a_pos');
+      gl.enableVertexAttribArray(loc);
+      gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+      uTime = gl.getUniformLocation(program, 'time');
+      uRes = gl.getUniformLocation(program, 'res');
+    } catch (e) {
+      errEl.textContent = 'Shader error: ' + e.message;
+    }
+    document.querySelectorAll('#buttons button').forEach((b) =>
+      b.classList.toggle('active', b.dataset.id === id));
+  }
+
+  const buttons = document.getElementById('buttons');
+  SHADERS.forEach((s) => {
+    const b = document.createElement('button');
+    b.textContent = s.name; b.dataset.id = s.id;
+    b.onclick = () => useShader(s.id);
+    buttons.appendChild(b);
+  });
+
+  function resize() {
+    canvas.width = innerWidth; canvas.height = innerHeight;
+    gl && gl.viewport(0, 0, canvas.width, canvas.height);
+  }
+  addEventListener('resize', resize); resize();
+
+  const start = performance.now();
+  function frame() {
+    if (gl && program) {
+      gl.uniform1f(uTime, (performance.now() - start) / 1000);
+      gl.uniform2f(uRes, canvas.width, canvas.height);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    }
+    requestAnimationFrame(frame);
+  }
+  if (gl) { useShader(current); frame(); }
+</script>
+</body>
+</html>

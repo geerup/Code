@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Generative Art Playground</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: ui-sans-serif, system-ui, sans-serif; background: #0a0a0f; color: #e8e8ef; }
+  header { padding: 14px 18px; border-bottom: 1px solid #23232e; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  h1 { font-size: 16px; margin: 0 16px 0 0; font-weight: 600; }
+  label { font-size: 13px; color: #aaa; display: flex; gap: 6px; align-items: center; }
+  select, input, button { background: #16161f; color: #e8e8ef; border: 1px solid #33333f; border-radius: 8px; padding: 7px 10px; font-size: 13px; }
+  button { cursor: pointer; }
+  button.primary { background: #5bc0be; color: #06121a; border-color: #5bc0be; font-weight: 600; }
+  main { display: grid; place-items: center; padding: 20px; }
+  canvas { background: #000; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,.5); max-width: 100%; height: auto; }
+  .hint { font-size: 12px; color: #777; }
+</style>
+</head>
+<body>
+<header>
+  <h1>🎨 Generative Art Playground</h1>
+  <label>Style
+    <select id="gen"></select>
+  </label>
+  <label>Seed
+    <input id="seed" type="text" value="hello" size="10" />
+  </label>
+  <button id="random">🎲 Random</button>
+  <button id="render" class="primary">Render</button>
+  <button id="save">⬇ PNG</button>
+  <span class="hint">Same seed → same art. URL updates so you can share a piece.</span>
+</header>
+<main><canvas id="c" width="900" height="600"></canvas></main>
+<script type="module">
+  import { rngFromSeed } from './src/rng.js';
+  import { GENERATORS, GENERATOR_NAMES } from './src/art.js';
+
+  const canvas = document.getElementById('c');
+  const ctx = canvas.getContext('2d');
+  const genSel = document.getElementById('gen');
+  const seedInput = document.getElementById('seed');
+
+  for (const name of GENERATOR_NAMES) {
+    const o = document.createElement('option');
+    o.value = o.textContent = name;
+    genSel.appendChild(o);
+  }
+
+  function syncURL() {
+    const u = new URL(location.href);
+    u.searchParams.set('gen', genSel.value);
+    u.searchParams.set('seed', seedInput.value);
+    history.replaceState(null, '', u);
+  }
+
+  function render() {
+    const gen = GENERATORS[genSel.value] || GENERATORS[GENERATOR_NAMES[0]];
+    gen(ctx, canvas.width, canvas.height, rngFromSeed(genSel.value + ':' + seedInput.value));
+    syncURL();
+  }
+
+  document.getElementById('render').onclick = render;
+  document.getElementById('random').onclick = () => {
+    seedInput.value = Math.random().toString(36).slice(2, 9);
+    render();
+  };
+  document.getElementById('save').onclick = () => {
+    const a = document.createElement('a');
+    a.download = `art-${genSel.value}-${seedInput.value}.png`;
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+  };
+
+  // Restore state from URL (shareable links).
+  const params = new URLSearchParams(location.search);
+  if (params.get('gen') && GENERATOR_NAMES.includes(params.get('gen'))) genSel.value = params.get('gen');
+  if (params.get('seed')) seedInput.value = params.get('seed');
+  render();
+</script>
+</body>
+</html>

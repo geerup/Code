@@ -1,0 +1,11 @@
+{
+  "name": "one-button-ascent",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Game-jam micro-game on the theme ONE BUTTON. Canvas, zero deps.",
+  "scripts": {
+    "test": "node --test",
+    "serve": "python3 -m http.server 8087"
+  }
+}

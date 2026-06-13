@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Physics Sandbox</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; font-family: ui-sans-serif, system-ui, sans-serif; background: #0a0a0f; color: #ddd; display: grid; place-items: center; min-height: 100vh; }
+  .wrap { text-align: center; }
+  h1 { font-size: 17px; }
+  canvas { background: #0d1117; border-radius: 10px; box-shadow: 0 10px 40px rgba(0,0,0,.5); cursor: grab; }
+  .hint { font-size: 12px; color: #888; }
+  button { background: #16161f; color: #ddd; border: 1px solid #33333f; border-radius: 8px; padding: 7px 12px; cursor: pointer; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🧵 Verlet Physics Sandbox — cloth</h1>
+  <canvas id="c" width="800" height="560"></canvas>
+  <p class="hint">Drag the cloth with the mouse. <button id="reset">Reset</button></p>
+</div>
+<script type="module">
+  import { World, buildGrid } from './src/physics.js';
+  const c = document.getElementById('c'), ctx = c.getContext('2d');
+  let world, grid;
+  function reset() {
+    world = new World({ width: c.width, height: c.height, gravity: 1400 });
+    grid = buildGrid(world, 28, 18, 24, 60, 30);
+  }
+  reset();
+  document.getElementById('reset').onclick = reset;
+
+  // Mouse drag grabs the nearest point.
+  let held = null;
+  c.addEventListener('mousedown', (e) => {
+    const r = c.getBoundingClientRect();
+    const mx = e.clientX - r.left, my = e.clientY - r.top;
+    let best = null, bd = 1e9;
+    for (const p of world.points) {
+      const d = Math.hypot(p.x - mx, p.y - my);
+      if (d < bd) { bd = d; best = p; }
+    }
+    if (bd < 30) held = best;
+  });
+  addEventListener('mousemove', (e) => {
+    if (!held) return;
+    const r = c.getBoundingClientRect();
+    held.x = e.clientX - r.left; held.y = e.clientY - r.top;
+    held.px = held.x; held.py = held.y;
+  });
+  addEventListener('mouseup', () => { held = null; });
+
+  function frame() {
+    world.step(1 / 60, 6);
+    ctx.fillStyle = '#0d1117'; ctx.fillRect(0, 0, c.width, c.height);
+    ctx.strokeStyle = '#5bc0be'; ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (const s of world.sticks) { ctx.moveTo(s.a.x, s.a.y); ctx.lineTo(s.b.x, s.b.y); }
+    ctx.stroke();
+    requestAnimationFrame(frame);
+  }
+  frame();
+</script>
+</body>
+</html>
