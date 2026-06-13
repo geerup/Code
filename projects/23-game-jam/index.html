@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>One Button Ascent</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; font-family: ui-sans-serif, system-ui, sans-serif; background: #07080d; color: #cde; display: grid; place-items: center; min-height: 100vh; user-select: none; }
+  .wrap { text-align: center; }
+  h1 { font-size: 16px; letter-spacing: 1px; }
+  canvas { background: linear-gradient(#0d1b2a, #1b263b); border-radius: 12px; touch-action: none; }
+  .hint { font-size: 12px; color: #789; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🐦 ONE BUTTON ASCENT</h1>
+  <canvas id="c" width="360" height="540"></canvas>
+  <p class="hint">Hold <b>Space</b> / mouse / touch to flap. One button — that's the whole game.</p>
+</div>
+<script type="module">
+  import { createGame, setFlap, step } from './src/game.js';
+  const c = document.getElementById('c'), ctx = c.getContext('2d');
+  let g = createGame({ seed: (Math.random() * 1e9) | 0 });
+
+  const press = (down) => {
+    if (g.over && down) { g = createGame({ seed: (Math.random() * 1e9) | 0 }); return; }
+    setFlap(g, down);
+  };
+  addEventListener('keydown', (e) => { if (e.code === 'Space') { press(true); e.preventDefault(); } });
+  addEventListener('keyup', (e) => { if (e.code === 'Space') press(false); });
+  c.addEventListener('mousedown', () => press(true));
+  addEventListener('mouseup', () => press(false));
+  c.addEventListener('touchstart', (e) => { press(true); e.preventDefault(); }, { passive: false });
+  addEventListener('touchend', () => press(false));
+
+  const birdX = g.width * 0.3;
+  let last = 0;
+  function frame(t) {
+    const dt = Math.min(0.033, (t - last) / 1000 || 0); last = t;
+    step(g, dt);
+    ctx.clearRect(0, 0, c.width, c.height);
+    ctx.fillStyle = '#2a9d8f';
+    for (const w of g.walls) {
+      ctx.fillRect(w.x, 0, 40, w.gapY);
+      ctx.fillRect(w.x, w.gapY + w.gapH, 40, c.height - (w.gapY + w.gapH));
+    }
+    ctx.fillStyle = g.flapping ? '#ffd166' : '#e9c46a';
+    ctx.beginPath(); ctx.arc(birdX, g.bird.y, 12, 0, 7); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.font = 'bold 22px system-ui'; ctx.textAlign = 'center';
+    ctx.fillText(g.score, c.width / 2, 40);
+    if (g.over) { ctx.font = '16px system-ui'; ctx.fillText('tap to retry', c.width / 2, c.height / 2); }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+</script>
+</body>
+</html>

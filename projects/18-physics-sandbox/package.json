@@ -1,0 +1,11 @@
+{
+  "name": "physics-sandbox",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Verlet-integration physics sandbox (cloth), zero deps.",
+  "scripts": {
+    "test": "node --test",
+    "serve": "python3 -m http.server 8086"
+  }
+}

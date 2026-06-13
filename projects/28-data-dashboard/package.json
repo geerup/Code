@@ -1,0 +1,11 @@
+{
+  "name": "live-data-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Real-time metrics dashboard with a tested time-series core. Zero deps.",
+  "scripts": {
+    "test": "node --test",
+    "serve": "python3 -m http.server 8088"
+  }
+}

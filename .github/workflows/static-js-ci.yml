@@ -5,9 +5,12 @@ on:
       - 'projects/03-generative-art-playground/**'
       - 'projects/14-npc-dialogue/**'
       - 'projects/17-procedural-dungeon/web/**'
+      - 'projects/18-physics-sandbox/**'
       - 'projects/19-retro-arcade/**'
       - 'projects/20-shader-gallery/**'
       - 'projects/21-level-editor/**'
+      - 'projects/23-game-jam/**'
+      - 'projects/28-data-dashboard/**'
       - '.github/workflows/static-js-ci.yml'
   pull_request:
 jobs:
@@ -19,9 +22,12 @@ jobs:
           - projects/03-generative-art-playground
           - projects/14-npc-dialogue
           - projects/17-procedural-dungeon/web
+          - projects/18-physics-sandbox
           - projects/19-retro-arcade
           - projects/20-shader-gallery
           - projects/21-level-editor
+          - projects/23-game-jam
+          - projects/28-data-dashboard
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
