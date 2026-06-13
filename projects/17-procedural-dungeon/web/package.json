@@ -1,0 +1,11 @@
+{
+  "name": "procedural-dungeon-web",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Browser visualizer + JS port of the Rust BSP dungeon generator.",
+  "scripts": {
+    "test": "node --test",
+    "serve": "python3 -m http.server 8083"
+  }
+}

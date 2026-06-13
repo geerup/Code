@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Procedural Dungeon</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; font-family: ui-sans-serif, system-ui, sans-serif; background: #0a0a0f; color: #ddd; display: grid; place-items: center; min-height: 100vh; }
+  .wrap { text-align: center; }
+  h1 { font-size: 18px; }
+  canvas { background: #05050a; border-radius: 10px; image-rendering: pixelated; box-shadow: 0 10px 40px rgba(0,0,0,.5); }
+  .row { display: flex; gap: 10px; justify-content: center; margin: 12px; align-items: center; flex-wrap: wrap; }
+  input, button { background: #16161f; color: #eee; border: 1px solid #33333f; border-radius: 8px; padding: 7px 12px; font-size: 13px; }
+  button { cursor: pointer; }
+  button.p { background: #5bc0be; color: #06121a; font-weight: 600; border-color: #5bc0be; }
+  .hint { font-size: 12px; color: #777; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🏰 Procedural Dungeon Generator</h1>
+  <div class="row">
+    <label class="hint">seed <input id="seed" type="number" value="42" style="width:90px"></label>
+    <button id="gen" class="p">Generate</button>
+    <button id="rand">🎲 Random</button>
+  </div>
+  <canvas id="c" width="640" height="400"></canvas>
+  <p class="hint" id="stat">Browser port of the Rust BSP generator — same algorithm, same idea.</p>
+</div>
+<script type="module">
+  import { generate } from './dungeon.js';
+  const c = document.getElementById('c');
+  const ctx = c.getContext('2d');
+  const W = 64, H = 40, CELL = 10;
+  c.width = W * CELL; c.height = H * CELL;
+
+  function draw(seed) {
+    const d = generate(W, H, BigInt(seed));
+    ctx.fillStyle = '#05050a'; ctx.fillRect(0, 0, c.width, c.height);
+    for (let y = 0; y < H; y++) {
+      for (let x = 0; x < W; x++) {
+        if (d.tiles[y * W + x] === 1) {
+          ctx.fillStyle = '#2a9d8f';
+          ctx.fillRect(x * CELL, y * CELL, CELL - 1, CELL - 1);
+        }
+      }
+    }
+    ctx.strokeStyle = '#e9c46a';
+    for (const r of d.rooms) ctx.strokeRect(r.x * CELL, r.y * CELL, r.w * CELL, r.h * CELL);
+    document.getElementById('stat').textContent = `seed ${seed} — ${d.rooms.length} rooms`;
+  }
+
+  document.getElementById('gen').onclick = () => draw(document.getElementById('seed').value);
+  document.getElementById('rand').onclick = () => {
+    const s = Math.floor(Math.random() * 1e9);
+    document.getElementById('seed').value = s; draw(s);
+  };
+  draw(42);
+</script>
+</body>
+</html>

@@ -2,8 +2,9 @@ name: go-ci
 on:
   push:
     paths:
+      - 'projects/02-multiplayer-arena/**'
       - 'projects/06-code-review-cli/**'
-      - 'projects/**/*.go'
+      - 'projects/22-leaderboard-service/**'
       - '.github/workflows/go-ci.yml'
   pull_request:
 jobs:
@@ -12,7 +13,9 @@ jobs:
     strategy:
       matrix:
         module:
+          - projects/02-multiplayer-arena
           - projects/06-code-review-cli
+          - projects/22-leaderboard-service
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5

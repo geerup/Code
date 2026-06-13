@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Level Editor</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: ui-sans-serif, system-ui, sans-serif; background: #0a0a0f; color: #e8e8ef; }
+  header { padding: 12px 16px; border-bottom: 1px solid #23232e; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  h1 { font-size: 15px; margin: 0 12px 0 0; }
+  .palette { display: flex; gap: 6px; }
+  .swatch { width: 30px; height: 30px; border-radius: 6px; border: 2px solid #33333f; cursor: pointer; }
+  .swatch.active { border-color: #fff; }
+  button { background: #16161f; color: #e8e8ef; border: 1px solid #33333f; border-radius: 8px; padding: 7px 11px; cursor: pointer; font-size: 13px; }
+  main { display: grid; place-items: center; padding: 18px; }
+  canvas { background: #05050a; border-radius: 8px; cursor: crosshair; }
+  textarea { width: 90%; max-width: 760px; height: 90px; margin: 12px auto; display: block; background: #11111a; color: #9fe; border: 1px solid #33333f; border-radius: 8px; font-family: monospace; font-size: 12px; }
+  .hint { font-size: 12px; color: #777; }
+</style>
+</head>
+<body>
+<header>
+  <h1>🧱 Level Editor</h1>
+  <div class="palette" id="palette"></div>
+  <button id="fillMode">Brush: paint</button>
+  <button id="export">⬇ Export JSON</button>
+  <button id="import">⬆ Import</button>
+  <button id="clear">Clear</button>
+  <span class="hint">Click/drag to paint. Exports JSON levels for a game to load.</span>
+</header>
+<main><canvas id="c"></canvas></main>
+<textarea id="json" placeholder="Exported level JSON appears here; paste here then Import."></textarea>
+<script type="module">
+  import { TileMap, TILES } from './src/tilemap.js';
+  const COLS = 24, ROWS = 16, CELL = 28;
+  const c = document.getElementById('c');
+  c.width = COLS * CELL; c.height = ROWS * CELL;
+  const ctx = c.getContext('2d');
+  let map = new TileMap(COLS, ROWS, 0);
+  let current = 1, fillMode = false, painting = false;
+
+  const palette = document.getElementById('palette');
+  TILES.forEach((t) => {
+    const s = document.createElement('div');
+    s.className = 'swatch' + (t.id === current ? ' active' : '');
+    s.style.background = t.color === 'transparent' ? 'repeating-conic-gradient(#222 0 25%, #2c2c2c 0 50%) 50%/12px 12px' : t.color;
+    s.title = t.name;
+    s.onclick = () => { current = t.id; [...palette.children].forEach((e, i) => e.classList.toggle('active', i === t.id)); };
+    palette.appendChild(s);
+  });
+
+  function draw() {
+    ctx.fillStyle = '#05050a'; ctx.fillRect(0, 0, c.width, c.height);
+    for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) {
+      const t = TILES[map.get(x, y)];
+      if (t && t.color !== 'transparent') { ctx.fillStyle = t.color; ctx.fillRect(x * CELL, y * CELL, CELL, CELL); }
+    }
+    ctx.strokeStyle = '#1b1b26';
+    for (let x = 0; x <= COLS; x++) { ctx.beginPath(); ctx.moveTo(x * CELL, 0); ctx.lineTo(x * CELL, c.height); ctx.stroke(); }
+    for (let y = 0; y <= ROWS; y++) { ctx.beginPath(); ctx.moveTo(0, y * CELL); ctx.lineTo(c.width, y * CELL); ctx.stroke(); }
+    requestAnimationFrame(draw);
+  }
+  draw();
+
+  function cell(e) {
+    const r = c.getBoundingClientRect();
+    return [Math.floor((e.clientX - r.left) / CELL), Math.floor((e.clientY - r.top) / CELL)];
+  }
+  function apply(e) {
+    const [x, y] = cell(e);
+    if (fillMode) map.fill(x, y, current); else map.set(x, y, current);
+  }
+  c.addEventListener('mousedown', (e) => { painting = true; apply(e); });
+  c.addEventListener('mousemove', (e) => { if (painting && !fillMode) apply(e); });
+  addEventListener('mouseup', () => { painting = false; });
+
+  document.getElementById('fillMode').onclick = (e) => { fillMode = !fillMode; e.target.textContent = 'Brush: ' + (fillMode ? 'fill' : 'paint'); };
+  document.getElementById('export').onclick = () => { document.getElementById('json').value = JSON.stringify(map.toJSON()); };
+  document.getElementById('import').onclick = () => {
+    try { map = TileMap.fromJSON(JSON.parse(document.getElementById('json').value)); }
+    catch (err) { alert('Invalid level JSON: ' + err.message); }
+  };
+  document.getElementById('clear').onclick = () => { map = new TileMap(COLS, ROWS, 0); };
+</script>
+</body>
+</html>

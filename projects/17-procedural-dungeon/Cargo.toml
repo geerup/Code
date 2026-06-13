@@ -1,0 +1,16 @@
+[package]
+name = "procedural_dungeon"
+version = "1.0.0"
+edition = "2021"
+description = "Seeded BSP dungeon generator (no external dependencies)."
+
+[lib]
+name = "procedural_dungeon"
+path = "src/lib.rs"
+
+[[bin]]
+name = "dungeon"
+path = "src/main.rs"
+
+[profile.release]
+opt-level = 3

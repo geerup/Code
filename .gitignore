@@ -31,3 +31,7 @@ __pycache__/
 report.json
 report.html
 *.index.json
+
+# Rust
+target/
+Cargo.lock

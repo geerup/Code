@@ -3,8 +3,10 @@ on:
   push:
     paths:
       - 'projects/03-generative-art-playground/**'
+      - 'projects/17-procedural-dungeon/web/**'
       - 'projects/19-retro-arcade/**'
       - 'projects/20-shader-gallery/**'
+      - 'projects/21-level-editor/**'
       - '.github/workflows/static-js-ci.yml'
   pull_request:
 jobs:
@@ -14,8 +16,10 @@ jobs:
       matrix:
         project:
           - projects/03-generative-art-playground
+          - projects/17-procedural-dungeon/web
           - projects/19-retro-arcade
           - projects/20-shader-gallery
+          - projects/21-level-editor
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
