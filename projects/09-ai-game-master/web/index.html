@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AI Game Master</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; font-family: ui-monospace, monospace; background: #0a0a0f; color: #cde; display: grid; place-items: center; min-height: 100vh; }
+  .box { width: min(680px, 94vw); }
+  h1 { font-size: 16px; }
+  #log { background: #0d1117; border: 1px solid #2a2a38; border-radius: 12px; padding: 16px; height: 52vh; overflow-y: auto; font-size: 14px; line-height: 1.5; }
+  .you { color: #5bc0be; }
+  .gm { color: #e9c46a; margin-bottom: 12px; }
+  .row { display: flex; gap: 8px; margin-top: 10px; }
+  input { flex: 1; background: #16161f; color: #cde; border: 1px solid #33333f; border-radius: 8px; padding: 10px; font-family: inherit; }
+  button { background: #5bc0be; color: #06121a; border: 0; border-radius: 8px; padding: 10px 16px; font-weight: 600; cursor: pointer; }
+  .state { font-size: 11px; color: #789; margin-top: 8px; }
+</style>
+</head>
+<body>
+<div class="box">
+  <h1>🐉 AI Game Master</h1>
+  <div id="log"></div>
+  <div class="row">
+    <input id="cmd" placeholder="what do you do? (e.g. go north, take torch)" autofocus />
+    <button id="send">Act</button>
+  </div>
+  <div class="state" id="state"></div>
+</div>
+<script>
+  const log = document.getElementById('log');
+  function line(cls, text) {
+    const d = document.createElement('div'); d.className = cls; d.textContent = text;
+    log.appendChild(d); log.scrollTop = log.scrollHeight;
+  }
+  function showState(s) {
+    document.getElementById('state').textContent =
+      `📍 ${s.location.name} · exits: ${Object.keys(s.location.exits).join(', ') || 'none'} · ` +
+      `here: ${s.location.items.join(', ') || '—'} · bag: ${s.inventory.join(', ') || 'empty'}`;
+  }
+  async function send() {
+    const input = document.getElementById('cmd');
+    const action = input.value.trim(); if (!action) return;
+    input.value = ''; line('you', '> ' + action);
+    try {
+      const res = await fetch('/action', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action }) });
+      const data = await res.json();
+      line('gm', data.narration); showState(data.state);
+    } catch (e) { line('gm', '(The Game Master is unreachable — run `python server.py`.)'); }
+  }
+  document.getElementById('send').onclick = send;
+  document.getElementById('cmd').addEventListener('keydown', (e) => { if (e.key === 'Enter') send(); });
+  fetch('/state').then(r => r.json()).then(s => { line('gm', 'You awaken in a forest clearing. What do you do?'); showState(s); }).catch(() => {});
+</script>
+</body>
+</html>

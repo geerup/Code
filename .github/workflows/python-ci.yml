@@ -4,6 +4,8 @@ on:
     paths:
       - 'projects/05-agentic-task-runner/**'
       - 'projects/07-ai-games-bridge/**'
+      - 'projects/09-ai-game-master/**'
+      - 'projects/10-ai-party-game/**'
       - 'projects/11-eval-harness/**'
       - 'projects/12-multi-agent-research/**'
       - 'projects/13-chat-bot/**'
@@ -20,6 +22,8 @@ jobs:
         project:
           - projects/05-agentic-task-runner
           - projects/07-ai-games-bridge
+          - projects/09-ai-game-master
+          - projects/10-ai-party-game
           - projects/11-eval-harness
           - projects/12-multi-agent-research
           - projects/13-chat-bot
