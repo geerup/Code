@@ -1,0 +1,65 @@
+/* Layout for uConsole AIO Control.
+   Tuned for the uConsole's short 1280x480 screen: compact log pane,
+   dense table rows. */
+
+Screen {
+    layout: vertical;
+}
+
+TabbedContent {
+    height: 1fr;
+}
+
+CategoryTable {
+    height: 1fr;
+}
+
+DataTable > .datatable--cursor {
+    background: $accent;
+    color: $text;
+}
+
+#log {
+    height: 10;
+    min-height: 5;
+    border-top: solid $accent;
+    background: $surface;
+    padding: 0 1;
+}
+
+/* Confirmation modal */
+ConfirmScreen {
+    align: center middle;
+}
+
+#confirm-box {
+    width: 60;
+    max-width: 90%;
+    height: auto;
+    padding: 1 2;
+    border: thick $warning;
+    background: $panel;
+}
+
+#confirm-title {
+    text-style: bold;
+    width: 100%;
+    content-align: center middle;
+}
+
+#confirm-cmd {
+    color: $text-muted;
+    width: 100%;
+    margin: 1 0;
+    content-align: center middle;
+}
+
+#confirm-buttons {
+    width: 100%;
+    height: auto;
+    align: center middle;
+}
+
+#confirm-buttons Button {
+    margin: 0 1;
+}

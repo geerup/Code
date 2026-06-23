@@ -1,0 +1,195 @@
+# ============================================================================
+# uConsole AIO Control - default configuration
+# ----------------------------------------------------------------------------
+# This file is the single source of truth for everything the TUI shows.
+# Copy it to ~/.config/uconsole-aio/aio.yaml and edit freely - or press `e`
+# inside the app to open it in $EDITOR. The app re-scans it on `R` (reload).
+#
+# Entry types:
+#   command : run once, show output in the log pane          -> needs `cmd`
+#   app     : launch a long-running / GUI program detached   -> needs `cmd`
+#   toggle  : on/off switch                                   -> needs `on`,`off`
+#
+# Optional per-entry keys:
+#   status      : shell command; exit code 0 == "on/active" (drives the badge)
+#   description : shown in the detail line
+#   confirm     : true  -> ask before running (use for TX / power cuts)
+#
+# Commands run through the shell, so pipes/redirects/env vars all work.
+# Tweak device paths (/dev/ttyUSB0, hub ports, frequencies) to match your AIO.
+# ============================================================================
+
+meta:
+  name: uConsole AIO Control
+  refresh_interval: 5   # seconds between automatic status refreshes (0 = off)
+
+categories:
+  # --------------------------------------------------------------------------
+  - id: sdr
+    title: SDR
+    icon: "📡"
+    description: HackRF / SoapySDR control and spectrum apps
+    entries:
+      - name: HackRF Info
+        type: command
+        cmd: hackrf_info
+        description: Probe the connected HackRF (firmware, serial, part id)
+      - name: SoapySDR Probe
+        type: command
+        cmd: SoapySDRUtil --probe
+        description: Enumerate SoapySDR devices and capabilities
+      - name: List SoapySDR Devices
+        type: command
+        cmd: SoapySDRUtil --find
+      - name: GQRX
+        type: app
+        cmd: gqrx
+        description: GQRX spectrum analyzer / receiver
+      - name: SDR++
+        type: app
+        cmd: sdrpp
+        description: SDR++ multi-platform SDR software
+      - name: CubicSDR
+        type: app
+        cmd: CubicSDR
+      - name: SDRangel
+        type: app
+        cmd: sdrangel
+
+  # --------------------------------------------------------------------------
+  - id: gps
+    title: GPS
+    icon: "🛰"
+    description: gpsd daemon and NMEA viewers
+    entries:
+      - name: gpsd daemon
+        type: toggle
+        on: sudo systemctl start gpsd
+        off: sudo systemctl stop gpsd
+        status: systemctl is-active --quiet gpsd
+        description: GPS daemon serving the AIO GPS module
+      - name: cgps (live fix)
+        type: app
+        cmd: cgps
+        description: ncurses live GPS fix viewer
+      - name: gpsmon
+        type: app
+        cmd: gpsmon
+      - name: Raw NMEA (5 sentences)
+        type: command
+        cmd: gpspipe -r -n 5
+        description: Dump raw NMEA straight from gpsd
+      - name: FoxtrotGPS map
+        type: app
+        cmd: foxtrotgps
+
+  # --------------------------------------------------------------------------
+  - id: lora
+    title: LoRa
+    icon: "📶"
+    description: LoRa / Meshtastic radio over serial
+    entries:
+      - name: Meshtastic Info
+        type: command
+        cmd: meshtastic --info
+        description: Query the LoRa node over serial
+      - name: Meshtastic Nodes
+        type: command
+        cmd: meshtastic --nodes
+      - name: Serial Monitor (115200)
+        type: app
+        cmd: picocom -b 115200 /dev/ttyUSB0
+        description: Raw serial console to the LoRa module (edit the port!)
+      - name: AT Ping
+        type: command
+        cmd: printf 'AT\r\n' > /dev/ttyUSB0 && timeout 2 cat /dev/ttyUSB0
+        description: Send a bare AT command and read the reply
+
+  # --------------------------------------------------------------------------
+  - id: usb_rail
+    title: USB Rail
+    icon: "🔌"
+    description: Switch power on the AIO's USB rail (uhubctl)
+    entries:
+      - name: List USB hubs
+        type: command
+        cmd: uhubctl
+        description: Show switchable hubs and current per-port power state
+      - name: Rail power (port 2)
+        type: toggle
+        on: uhubctl -a on -p 2
+        off: uhubctl -a off -p 2
+        status: uhubctl -p 2 2>/dev/null | grep -q ' power'
+        confirm: true
+        description: Cut/restore power to USB rail port 2 (adjust -l hub/-p port)
+
+  # --------------------------------------------------------------------------
+  - id: satellites
+    title: Satellites
+    icon: "🌐"
+    description: Tracking and satellite-signal decoding
+    entries:
+      - name: Gpredict (tracking)
+        type: app
+        cmd: gpredict
+        description: Real-time satellite tracking & pass prediction
+      - name: SatDump (GUI)
+        type: app
+        cmd: satdump-ui
+        description: SatDump GUI for live/offline satellite decoding
+      - name: Next ISS pass
+        type: command
+        cmd: echo 'ISS' | predict -f ISS 2>/dev/null || echo "predict not configured"
+        description: Predict the next ISS pass (requires predict + TLEs)
+      - name: Update TLEs (Celestrak)
+        type: command
+        cmd: curl -fsS https://celestrak.org/NORAD/elements/gp.php?GROUP=active&FORMAT=tle -o ~/.config/uconsole-aio/active.tle && echo "TLEs updated"
+        description: Download current active-satellite TLEs
+
+  # --------------------------------------------------------------------------
+  - id: weather
+    title: Weather
+    icon: "🌦"
+    description: Weather-satellite and ISM sensor decoding
+    entries:
+      - name: noaa-apt (decoder)
+        type: app
+        cmd: noaa-apt
+        description: Decode NOAA APT weather-satellite images
+      - name: rtl_433 sensors
+        type: toggle
+        on: nohup rtl_433 -F json > ~/.config/uconsole-aio/rtl_433.json 2>/dev/null &
+        off: pkill -f rtl_433
+        status: pgrep -f rtl_433
+        description: Decode 433MHz weather/ISM sensors to JSON
+      - name: SatDump NOAA APT (live)
+        type: app
+        cmd: satdump live noaa_apt /tmp/noaa --source soapy --samplerate 2.4e6 --frequency 137.1e6
+        description: Live NOAA APT capture via SatDump (edit frequency per pass)
+
+  # --------------------------------------------------------------------------
+  - id: radio
+    title: Radio
+    icon: "📻"
+    description: General receive/transmit utilities
+    entries:
+      - name: FM radio (rtl_fm)
+        type: toggle
+        on: nohup sh -c 'rtl_fm -f 96.9M -M wbfm -s 200000 -r 48000 | aplay -r 48000 -f S16_LE' >/dev/null 2>&1 &
+        off: pkill -f rtl_fm
+        status: pgrep -f rtl_fm
+        description: Listen to broadcast FM (edit frequency)
+      - name: ADS-B (dump1090)
+        type: toggle
+        on: nohup dump1090-fa --quiet >/dev/null 2>&1 &
+        off: pkill -f dump1090
+        status: pgrep -f dump1090
+        description: Decode 1090MHz aircraft transponders
+      - name: APRS (direwolf)
+        type: app
+        cmd: direwolf
+        description: Direwolf soundcard TNC / APRS decoder
+      - name: rtl_power sweep
+        type: command
+        cmd: timeout 10 rtl_power -f 88M:108M:100k -g 20 -i 5 -1 /tmp/sweep.csv && echo "Wrote /tmp/sweep.csv"
+        description: 10s wideband power sweep of the FM band
