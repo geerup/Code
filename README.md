@@ -13,16 +13,23 @@ commands you generate with **Claude Code** — without touching any Python.
 
 ```
 ┌ uConsole AIO Control ───────────────────────────────────────┐
-│  SDR   GPS   LoRa   USB Rail   Satellites   Weather   Radio  │
-│  ●  HackRF Info        command   hackrf_info                 │
-│  ○  gpsd daemon        toggle    sudo systemctl start gpsd   │
-│  ●  rtl_433 sensors    toggle    rtl_433 -F json             │
-│  ·  GQRX               app       gqrx                        │
+│  AIO Power   RTL-SDR   GPS   LoRa   Satellites   Weather ... │
+│  ●  SDR rail           toggle    aiov2_ctl SDR on            │
+│  ○  GPS rail           toggle    aiov2_ctl GPS on            │
+│  ●  LoRa rail          toggle    aiov2_ctl LORA on           │
+│  ·  Detailed status    command   aiov2_ctl --status         │
 ├──────────────────────────────────────────────────────────────┤
-│ $ hackrf_info                                                │
-│ Found HackRF / Serial: 0x...                                 │
+│ $ aiov2_ctl SDR on                                           │
+│ SDR rail: ON                                                 │
 └──────────────────────────────────────────────────────────────┘
 ```
+
+> **AIO V2 power gating:** the SDR, GPS, LoRa and internal-USB rails are off at
+> boot and GPIO-gated — a peripheral won't enumerate until its rail is powered.
+> The **AIO Power** tab drives HackerGadgets' official
+> [`aiov2_ctl`](https://github.com/hackergadgets/aiov2_ctl) tool
+> (`aiov2_ctl <SDR|GPS|LORA|USB> on|off`). Turn a rail on there first, then use
+> the matching apps in the other tabs.
 
 ## Why a TUI
 
@@ -110,19 +117,27 @@ Commands run through the shell, so pipes, redirects and env vars all work.
 Adjust device paths (`/dev/ttyUSB0`), hub ports and frequencies to match your
 AIO wiring, then press `R` in the app to reload.
 
-### Default toolchain targeted
+### Default toolchain targeted (AIO V2)
 
-- **SDR** — `hackrf_info`, `SoapySDRUtil`, gqrx, SDR++, CubicSDR, SDRangel
+- **AIO Power** — `aiov2_ctl` rail toggles (SDR/GPS/LoRa/USB), status, live power
+  readout, boot-rail config, RTC sync, official GUI
+- **RTL-SDR** — `rtl_test`, `SoapySDRUtil` (`driver=rtlsdr`), `rtl_biast` 5V
+  bias-tee, `rtl_tcp`, gqrx, SDR++, CubicSDR, SDRangel
 - **GPS** — `gpsd`, `cgps`, `gpsmon`, raw NMEA via `gpspipe`, FoxtrotGPS
-- **LoRa** — Meshtastic CLI, serial console (`picocom`), raw AT commands
-- **USB rail** — `uhubctl` per-port power toggles
+- **LoRa** — Meshtastic CLI (`--info` / `--nodes` / `--sendtext` / `--listen`)
+  for the SX1262 module
 - **Satellites** — Gpredict, SatDump, `predict`, TLE updates
-- **Weather** — `noaa-apt`, `rtl_433`, SatDump live APT
+- **Weather** — `noaa-apt`, `rtl_433`, SatDump live APT (`--source rtlsdr`)
 - **Radio** — `rtl_fm` FM, `dump1090` ADS-B, Direwolf APRS, `rtl_power` sweeps
 
-These tools aren't bundled — install what you use (`apt install gpsd gpsd-clients
-rtl-433 ...`, build SatDump, etc.). Missing tools simply show as `off`/error
-when run; they never crash the app.
+Install `aiov2_ctl` first (see the box above); it's what powers the rails. The
+radio tools aren't bundled — install what you use (`apt install rtl-sdr gpsd
+gpsd-clients rtl-433`, `pipx install meshtastic`, build SatDump, etc.). Missing
+tools simply show as `off`/error when run; they never crash the app.
+
+> The AIO V2 SDR is a **receive-only RTL-SDR** (R828D, 100 kHz – 1.74 GHz). The
+> only transmitter on the board is the **LoRa SX1262** — `--sendtext` is marked
+> `confirm: true` so you don't key up by accident.
 
 ## Adding commands with Claude Code
 

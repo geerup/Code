@@ -1,7 +1,15 @@
 # Guidance for Claude Code
 
 This project is **uConsole AIO Control** — a Textual TUI that controls the
-HackerGadgets v2 AIO (SDR / LoRa / GPS / USB rail) on a ClockworkPi uConsole.
+HackerGadgets **AIO V2** board (RTL-SDR / SX1262 LoRa / GPS / USB) on a
+ClockworkPi uConsole.
+
+**Hardware reality to keep in mind:** the SDR/GPS/LoRa/USB rails are GPIO
+power-gated and off at boot. The official `aiov2_ctl` tool
+(`aiov2_ctl <SDR|GPS|LORA|USB> on|off`, plus `--status`/`--power`) switches
+them; a peripheral won't enumerate until its rail is on. The SDR is a
+receive-only **RTL-SDR**; the only transmitter is the LoRa SX1262, so anything
+that keys up (e.g. `meshtastic --sendtext`) should set `confirm: true`.
 
 The most common request will be **"add a command/app/toggle"**. That almost
 never means writing Python — it means appending an entry to the YAML config.

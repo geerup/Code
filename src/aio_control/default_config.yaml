@@ -1,22 +1,32 @@
 # ============================================================================
 # uConsole AIO Control - default configuration
 # ----------------------------------------------------------------------------
-# This file is the single source of truth for everything the TUI shows.
-# Copy it to ~/.config/uconsole-aio/aio.yaml and edit freely - or press `e`
-# inside the app to open it in $EDITOR. The app re-scans it on `R` (reload).
+# Targets the HackerGadgets "uConsole AIO V2" extension board:
+#   * RTL-SDR receiver  (R828D, 100 kHz - 1.74 GHz, TCXO, 5V bias-tee)
+#   * LoRa SX1262       (860-960 MHz, 22 dBm, Meshtastic out of the box)
+#   * GPS / BDS / GNSS  (active + passive antenna)
+#   * RTC PCF85063A, USB 3.0 hub, 1 Gbps Ethernet, internal USB-C
+#
+# IMPORTANT - power gating:
+#   On the AIO V2 the SDR, GPS, LoRa and internal-USB rails are OFF at boot and
+#   power-gated via GPIO. A peripheral is NOT enumerated until its rail is on.
+#   HackerGadgets ships the official `aiov2_ctl` tool to switch the rails:
+#       aiov2_ctl <GPS|LORA|SDR|USB> <on|off>
+#   So: open the "AIO Power" tab first and turn on the rail you need, THEN use
+#   the matching SDR/GPS/LoRa apps in the other tabs.
+#   Install it with:  git clone https://github.com/hackergadgets/aiov2_ctl
+#                     cd aiov2_ctl && sudo python3 ./aiov2_ctl.py --install
+#
+# Status badges for the aiov2_ctl rails are derived by grepping
+# `aiov2_ctl --status`. The exact label/wording can vary between tool
+# versions, so if a rail badge looks wrong, tweak the `status:` grep below.
 #
 # Entry types:
 #   command : run once, show output in the log pane          -> needs `cmd`
 #   app     : launch a long-running / GUI program detached   -> needs `cmd`
 #   toggle  : on/off switch                                   -> needs `on`,`off`
-#
-# Optional per-entry keys:
-#   status      : shell command; exit code 0 == "on/active" (drives the badge)
-#   description : shown in the detail line
-#   confirm     : true  -> ask before running (use for TX / power cuts)
-#
-# Commands run through the shell, so pipes/redirects/env vars all work.
-# Tweak device paths (/dev/ttyUSB0, hub ports, frequencies) to match your AIO.
+# Optional: status (exit 0 == "on"), description, confirm (ask first).
+# Commands run through the shell; tweak frequencies/ports to your setup.
 # ============================================================================
 
 meta:
@@ -25,30 +35,91 @@ meta:
 
 categories:
   # --------------------------------------------------------------------------
-  - id: sdr
-    title: SDR
-    icon: "📡"
-    description: HackRF / SoapySDR control and spectrum apps
+  - id: aio
+    title: AIO Power
+    icon: "⚡"
+    description: Power rails & telemetry via the official aiov2_ctl tool
     entries:
-      - name: HackRF Info
+      - name: SDR rail
+        type: toggle
+        on:  aiov2_ctl SDR on
+        off: aiov2_ctl SDR off
+        status: aiov2_ctl --status 2>/dev/null | grep -i sdr | grep -iqw on
+        description: Power the RTL-SDR rail (enable before using SDR apps)
+      - name: GPS rail
+        type: toggle
+        on:  aiov2_ctl GPS on
+        off: aiov2_ctl GPS off
+        status: aiov2_ctl --status 2>/dev/null | grep -i gps | grep -iqw on
+        description: Power the GPS/GNSS rail (enable before gpsd)
+      - name: LoRa rail
+        type: toggle
+        on:  aiov2_ctl LORA on
+        off: aiov2_ctl LORA off
+        status: aiov2_ctl --status 2>/dev/null | grep -i lora | grep -iqw on
+        description: Power the SX1262 LoRa rail (enable before Meshtastic)
+      - name: Internal USB rail
+        type: toggle
+        on:  aiov2_ctl USB on
+        off: aiov2_ctl USB off
+        status: aiov2_ctl --status 2>/dev/null | grep -i usb | grep -iqw on
+        description: Power the internal USB hub rail
+      - name: Show rail state
         type: command
-        cmd: hackrf_info
-        description: Probe the connected HackRF (firmware, serial, part id)
-      - name: SoapySDR Probe
+        cmd: aiov2_ctl
+        description: Current GPIO state of all rails
+      - name: Detailed status
         type: command
-        cmd: SoapySDRUtil --probe
-        description: Enumerate SoapySDR devices and capabilities
-      - name: List SoapySDR Devices
+        cmd: aiov2_ctl --status
+      - name: Power readout (5s)
         type: command
-        cmd: SoapySDRUtil --find
+        cmd: timeout 5 aiov2_ctl --power || true
+        description: Live per-rail power draw, sampled for 5 seconds
+      - name: Boot rails status
+        type: command
+        cmd: aiov2_ctl --boot-rails-status
+        description: Which rails power on automatically at boot
+      - name: Sync RTC
+        type: command
+        cmd: sudo aiov2_ctl --sync-rtc
+        description: Sync the PCF85063A RTC from system time
+      - name: aiov2_ctl GUI
+        type: app
+        cmd: aiov2_ctl --gui
+        description: Official graphical control panel
+
+  # --------------------------------------------------------------------------
+  - id: sdr
+    title: RTL-SDR
+    icon: "📡"
+    description: RTL-SDR receiver (needs the SDR rail powered on)
+    entries:
+      - name: RTL-SDR self-test
+        type: command
+        cmd: rtl_test -t
+        description: Probe the RTL-SDR, report tuner & sample-rate support
+      - name: SoapySDR probe
+        type: command
+        cmd: SoapySDRUtil --probe="driver=rtlsdr"
+        description: Enumerate the RTL-SDR via SoapySDR
+      - name: Bias-tee 5V (antenna)
+        type: toggle
+        on:  rtl_biast -b 1
+        off: rtl_biast -b 0
+        confirm: true
+        description: Feed 5V to the antenna port for an LNA (off for plain antennas!)
+      - name: rtl_tcp server
+        type: toggle
+        on:  nohup rtl_tcp -a 0.0.0.0 >/dev/null 2>&1 &
+        off: pkill -f rtl_tcp
+        status: pgrep -f rtl_tcp
+        description: Stream IQ over TCP for a networked SDR client
       - name: GQRX
         type: app
         cmd: gqrx
-        description: GQRX spectrum analyzer / receiver
       - name: SDR++
         type: app
         cmd: sdrpp
-        description: SDR++ multi-platform SDR software
       - name: CubicSDR
         type: app
         cmd: CubicSDR
@@ -60,14 +131,14 @@ categories:
   - id: gps
     title: GPS
     icon: "🛰"
-    description: gpsd daemon and NMEA viewers
+    description: GPS/GNSS (needs the GPS rail powered on)
     entries:
       - name: gpsd daemon
         type: toggle
-        on: sudo systemctl start gpsd
+        on:  sudo systemctl start gpsd
         off: sudo systemctl stop gpsd
         status: systemctl is-active --quiet gpsd
-        description: GPS daemon serving the AIO GPS module
+        description: GPS daemon serving the AIO GNSS receiver
       - name: cgps (live fix)
         type: app
         cmd: cgps
@@ -87,41 +158,25 @@ categories:
   - id: lora
     title: LoRa
     icon: "📶"
-    description: LoRa / Meshtastic radio over serial
+    description: SX1262 / Meshtastic (needs the LoRa rail powered on)
     entries:
       - name: Meshtastic Info
         type: command
         cmd: meshtastic --info
-        description: Query the LoRa node over serial
+        description: Query the SX1262 Meshtastic node
       - name: Meshtastic Nodes
         type: command
         cmd: meshtastic --nodes
-      - name: Serial Monitor (115200)
-        type: app
-        cmd: picocom -b 115200 /dev/ttyUSB0
-        description: Raw serial console to the LoRa module (edit the port!)
-      - name: AT Ping
+        description: List nodes seen on the mesh
+      - name: Send text message
         type: command
-        cmd: printf 'AT\r\n' > /dev/ttyUSB0 && timeout 2 cat /dev/ttyUSB0
-        description: Send a bare AT command and read the reply
-
-  # --------------------------------------------------------------------------
-  - id: usb_rail
-    title: USB Rail
-    icon: "🔌"
-    description: Switch power on the AIO's USB rail (uhubctl)
-    entries:
-      - name: List USB hubs
-        type: command
-        cmd: uhubctl
-        description: Show switchable hubs and current per-port power state
-      - name: Rail power (port 2)
-        type: toggle
-        on: uhubctl -a on -p 2
-        off: uhubctl -a off -p 2
-        status: uhubctl -p 2 2>/dev/null | grep -q ' power'
+        cmd: meshtastic --sendtext "Hello from the uConsole"
         confirm: true
-        description: Cut/restore power to USB rail port 2 (adjust -l hub/-p port)
+        description: TRANSMIT a text message over LoRa (22 dBm)
+      - name: Meshtastic listen
+        type: app
+        cmd: meshtastic --listen
+        description: Live-print incoming mesh packets
 
   # --------------------------------------------------------------------------
   - id: satellites
@@ -139,11 +194,11 @@ categories:
         description: SatDump GUI for live/offline satellite decoding
       - name: Next ISS pass
         type: command
-        cmd: echo 'ISS' | predict -f ISS 2>/dev/null || echo "predict not configured"
+        cmd: predict -f ISS 2>/dev/null || echo "predict not configured (needs TLEs)"
         description: Predict the next ISS pass (requires predict + TLEs)
       - name: Update TLEs (Celestrak)
         type: command
-        cmd: curl -fsS https://celestrak.org/NORAD/elements/gp.php?GROUP=active&FORMAT=tle -o ~/.config/uconsole-aio/active.tle && echo "TLEs updated"
+        cmd: curl -fsS "https://celestrak.org/NORAD/elements/gp.php?GROUP=active&FORMAT=tle" -o ~/.config/uconsole-aio/active.tle && echo "TLEs updated"
         description: Download current active-satellite TLEs
 
   # --------------------------------------------------------------------------
@@ -158,30 +213,30 @@ categories:
         description: Decode NOAA APT weather-satellite images
       - name: rtl_433 sensors
         type: toggle
-        on: nohup rtl_433 -F json > ~/.config/uconsole-aio/rtl_433.json 2>/dev/null &
+        on:  nohup rtl_433 -F json > ~/.config/uconsole-aio/rtl_433.json 2>/dev/null &
         off: pkill -f rtl_433
         status: pgrep -f rtl_433
         description: Decode 433MHz weather/ISM sensors to JSON
       - name: SatDump NOAA APT (live)
         type: app
-        cmd: satdump live noaa_apt /tmp/noaa --source soapy --samplerate 2.4e6 --frequency 137.1e6
+        cmd: satdump live noaa_apt /tmp/noaa --source rtlsdr --samplerate 2.4e6 --frequency 137.1e6
         description: Live NOAA APT capture via SatDump (edit frequency per pass)
 
   # --------------------------------------------------------------------------
   - id: radio
     title: Radio
     icon: "📻"
-    description: General receive/transmit utilities
+    description: General receive utilities (RTL-SDR is receive-only)
     entries:
       - name: FM radio (rtl_fm)
         type: toggle
-        on: nohup sh -c 'rtl_fm -f 96.9M -M wbfm -s 200000 -r 48000 | aplay -r 48000 -f S16_LE' >/dev/null 2>&1 &
+        on:  nohup sh -c 'rtl_fm -f 96.9M -M wbfm -s 200000 -r 48000 | aplay -r 48000 -f S16_LE' >/dev/null 2>&1 &
         off: pkill -f rtl_fm
         status: pgrep -f rtl_fm
         description: Listen to broadcast FM (edit frequency)
       - name: ADS-B (dump1090)
         type: toggle
-        on: nohup dump1090-fa --quiet >/dev/null 2>&1 &
+        on:  nohup dump1090-fa --quiet >/dev/null 2>&1 &
         off: pkill -f dump1090
         status: pgrep -f dump1090
         description: Decode 1090MHz aircraft transponders

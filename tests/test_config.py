@@ -10,7 +10,7 @@ def test_default_config_loads():
     cfg = load_config()  # bundled default
     assert cfg.categories
     ids = {c.id for c in cfg.categories}
-    assert {"sdr", "gps", "lora", "usb_rail"} <= ids
+    assert {"aio", "sdr", "gps", "lora"} <= ids
     # every entry has its required fields validated already
     total = sum(len(c.entries) for c in cfg.categories)
     assert total > 10
