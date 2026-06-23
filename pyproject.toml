@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "uconsole-aio-control"
+version = "0.1.0"
+description = "Keyboard-driven TUI to control the HackerGadgets v2 AIO (SDR/LoRa/GPS/USB rail) on the ClockworkPi uConsole."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "geerup" }]
+keywords = ["uconsole", "sdr", "hackrf", "lora", "gps", "tui", "textual", "ham-radio"]
+classifiers = [
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Topic :: Communications :: Ham Radio",
+]
+dependencies = [
+    "textual>=0.60",
+    "PyYAML>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7",
+    "pytest-asyncio>=0.23",
+]
+
+[project.scripts]
+aioctl = "aio_control.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/geerup/Code"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+aio_control = ["*.yaml", "*.tcss"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
