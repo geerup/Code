@@ -3,7 +3,7 @@
 Baseline shell and terminal-multiplexer configuration used across my Linux systems
 (homelab host, uConsole portable, remote jump boxes).
 
-Status: in progress (importing sanitized configs)
+Status: in progress (structure and docs ready; sanitized configs still to be added)
 
 ## What's here
 
@@ -12,8 +12,8 @@ Status: in progress (importing sanitized configs)
   defaults for long-lived sessions.
 - `install.sh` — symlinks these files into `$HOME`, backing up anything already there.
 
-Both `bashrc` and `tmux.conf` currently contain an import marker instead of the live
-config — see "Importing your own configs" below.
+Both `bashrc` and `tmux.conf` currently contain a placeholder note instead of the live
+config — see "Adding the real configs" below.
 
 ## Install
 
@@ -44,12 +44,11 @@ a new shell, and `tmux kill-server` / restart tmux to pick up the new config.
   identically on a full homelab server and on an ARM64 handheld (uConsole); nothing here
   assumes a specific hostname, network, or desktop environment.
 
-## Importing your own configs
+## Adding the real configs
 
-`bashrc` and `tmux.conf` are placeholders with an `OPERATOR:` marker at the top. To
-populate them:
+`bashrc` and `tmux.conf` are currently placeholders. To populate them:
 
-1. Copy your real `~/.bashrc` / `~/.tmux.conf` over the placeholder files.
+1. Copy the real `~/.bashrc` / `~/.tmux.conf` over the placeholder files.
 2. Strip anything environment-specific: hostnames, IPs, tailnet/MagicDNS names, API
    tokens or keys exported as environment variables, and work-specific paths.
-3. Re-run the sanitization scan from `CLAUDE.md` before committing.
+3. Scan for secrets before committing.

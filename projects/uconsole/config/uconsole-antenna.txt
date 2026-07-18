@@ -13,6 +13,6 @@
 # Placement: parameters like this go in the firmware config file the bootloader reads
 # (e.g. /boot/firmware/config.txt on current Raspberry Pi OS layouts).
 #
-# > OPERATOR: import from your setup reference — the actual parameter(s) this build
-# > uses, which physical connector each value maps to, and which radio it applies to.
-# > Replace this generic example only with values you have verified on the device.
+# > _To be added: the actual parameter(s) this build uses, which physical connector each
+# > value maps to, and which radio it applies to. This generic example will be replaced
+# > only with values verified on the device._

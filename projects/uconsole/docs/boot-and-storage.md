@@ -55,12 +55,11 @@ rpi-eeprom-config
 rpi-eeprom-config --edit
 ```
 
-> OPERATOR: import from your setup reference — the exact commands, bootloader version,
-> any `rpi-eeprom-update` steps, and the confirmation output you saw. Do not invent
-> version strings or logs.
+> _To be added: the exact commands, bootloader version, any `rpi-eeprom-update` steps,
+> and the confirmation output from this build._
 
 ## Storage layout
 
-> OPERATOR: import the partition/filesystem layout on the NVMe (and SD, if used),
-> mount points, and any tuning (fstab options, swap policy). Scrub UUIDs/serials that
-> could identify the specific drive if you consider them sensitive.
+> _To be added: the partition/filesystem layout on the NVMe (and SD, if used), mount
+> points, and any tuning (fstab options, swap policy), with UUIDs/serials that could
+> identify the specific drive scrubbed._

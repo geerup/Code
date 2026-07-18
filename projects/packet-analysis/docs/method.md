@@ -118,6 +118,6 @@ Checklist before a pcap enters `captures/`:
 - No real MAC addresses.
 - File is a handful of packets, not a session.
 
-> OPERATOR: run this procedure on your lab setup, produce the two small pcaps, verify
-> them against the checklist, then commit them with `git add -f` (the repo `.gitignore`
-> excludes `*.pcap*` by default).
+> _To do: run this procedure on the lab setup, produce the two small pcaps, verify
+> them against the checklist, then add them with `git add -f` (the repo `.gitignore`
+> excludes `*.pcap*` by default)._

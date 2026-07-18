@@ -9,10 +9,10 @@ Battery runtime is set by draw at each operating state, not by a single "typical
 Profiling idle vs. load lets you size expected runtime from the pack capacity and decide
 which subsystems (radios, display backlight, NVMe) are worth gating when on battery.
 
-## Method (template)
+## Method
 
-> OPERATOR: fill in the specifics of your measurement rig before publishing. The
-> structure below is the intended method; the bracketed items are what to supply.
+> _Specifics of the measurement rig to be added. The structure below is the intended
+> method; the bracketed items are what remains to be filled in._
 
 1. **Instrument:** [inline USB power meter / bench PSU with current readout / other —
    specify make/model and its resolution and accuracy].

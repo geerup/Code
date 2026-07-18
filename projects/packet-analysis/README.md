@@ -60,9 +60,9 @@ the application claims.
 ## Decisions
 
 - **Capture on a lab/loopback setup, not live browsing.** The pcaps in this repo must be
-  publishable. A capture taken during real browsing would embed real destinations, the
-  operator's resolver, LAN addressing, and MAC addresses — sanitizing that after the
-  fact is error-prone, and one missed field deanonymizes the operator. A dedicated lab
+  publishable. A capture taken during real browsing would embed real destinations, my
+  own resolver, LAN addressing, and MAC addresses — sanitizing that after the
+  fact is error-prone, and one missed field deanonymizes me. A dedicated lab
   capture against a documentation hostname contains nothing sensitive by construction,
   and it isolates exactly the packets that matter, keeping the pcaps tiny.
 - **tshark over the Wireshark GUI for the method.** Every step is a copy-pasteable

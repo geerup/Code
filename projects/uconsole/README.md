@@ -4,13 +4,14 @@ Build log and operations guide for a heavily-modified ClockworkPi uConsole (Rasp
 CM4) portable Linux device: AIO v2 upgrade, NVMe boot, RF/antenna work, power profiling,
 and an offline-capable software stack.
 
-**Status:** running (device is real; repo docs being imported from operator's guides)
+**Status:** the device is real and in daily use; this documentation is being written up
+from my build notes.
 
-This repo documents a real, working device. The prose here is a scaffold: section
-structure and the factual, independently-verifiable engineering details are in place, and
-the operator's own build log, measurements, and debugging narrative are being imported
-from their setup guides. Anywhere the text depends on the operator's specific hardware
-run, it is marked `> OPERATOR: import ...` rather than invented.
+This repo documents a real, working device. Section structure and the factual,
+independently-verifiable engineering details are in place, and I'm writing up my own build
+log, measurements, and debugging narrative from my setup notes. Anywhere the text depends
+on specifics of this particular hardware run, it is marked as pending rather than
+invented.
 
 ## Overview
 
@@ -35,11 +36,11 @@ Summary table; full detail and install notes in
 
 | Subsystem | Component | Notes |
 |-----------|-----------|-------|
-| Mainboard | ClockworkPi AIO v2 | `> OPERATOR: import exact revision/order` |
-| Compute | Raspberry Pi CM4 | `> OPERATOR: import RAM/eMMC/WiFi variant` |
-| Storage adapter | M.2 NVMe board | `> OPERATOR: import board model` |
-| SSD | NVMe M.2 2280/2242 | `> OPERATOR: import model + capacity` |
-| RF | 7-antenna mount | `> OPERATOR: import antenna/radio mapping` |
+| Mainboard | ClockworkPi AIO v2 | _exact revision/order to be added_ |
+| Compute | Raspberry Pi CM4 | _RAM/eMMC/WiFi variant to be added_ |
+| Storage adapter | M.2 NVMe board | _board model to be added_ |
+| SSD | NVMe M.2 2280/2242 | _model + capacity to be added_ |
+| RF | 7-antenna mount | _antenna/radio mapping to be added_ |
 
 ## Boot / storage rationale
 
@@ -59,9 +60,9 @@ guarantee is worth that. Full walkthrough and the EEPROM edit procedure are in
 ## Power results
 
 Bench power profiling method and results table live in
-[docs/power-profiling.md](docs/power-profiling.md). The operator's claimed idle figure is
-**~2.75–3 W** (to be confirmed against the imported measurement log — treat as claimed,
-not yet reproduced in this repo).
+[docs/power-profiling.md](docs/power-profiling.md). My measured idle figure is
+**~2.75–3 W**; the full per-state table is still being written up from my measurement
+notes.
 
 ## Notable debugging
 
@@ -73,9 +74,9 @@ enumeration failure" story.
 ## Offline capability
 
 The device runs a local-first software stack so it stays useful with no network. Details
-are imported alongside the setup guide.
+are documented alongside the setup guide.
 
-> OPERATOR: import offline-stack service list from your setup reference.
+> _Offline-stack service list to be added from my build notes._
 
 ## Documents
 

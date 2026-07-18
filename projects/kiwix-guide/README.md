@@ -6,7 +6,7 @@ Gutenberg, etc.) from local ZIM archive files with no internet connection requir
 this repo is the landing page that ties those archives together into one browsable
 "library" instead of a bare directory listing from `kiwix-serve`.
 
-Status: running (guide import pending)
+Status: in progress (setup docs ready; themed front-end still to be added)
 
 ## What it is
 

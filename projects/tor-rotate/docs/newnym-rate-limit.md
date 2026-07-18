@@ -38,8 +38,8 @@ done
 ```
 
 *feels* like it rotates once per second. It does not. It sends 10 signals per effective
-rotation, all but one of which are coalesced away. The operator reads the stream of
-`250 OK` replies and believes they are cycling through ten exit relays; in reality they
+rotation, all but one of which are coalesced away. You read the stream of
+`250 OK` replies and believe you are cycling through ten exit relays; in reality you
 are on roughly the same circuit for ~10 seconds at a time. Worse, the false sense of
 churn can lead someone to believe correlation is harder than it actually is.
 

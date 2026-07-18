@@ -2,9 +2,9 @@
 
 Sanitized lab packet captures demonstrating the SOCKS5 DNS leak and the fix.
 
-**Status: pending.** No pcaps are committed yet. They must be captured by the operator
-on a lab/loopback setup — see [`../docs/method.md`](../docs/method.md) for the exact
-procedure — and then reviewed before they land here.
+**Status: pending.** No pcaps are committed yet. I still need to capture them on a
+lab/loopback setup — see [`../docs/method.md`](../docs/method.md) for the exact
+procedure — and check them against the rules below before they land here.
 
 ## What goes here (once captured)
 
@@ -30,6 +30,6 @@ Two tiny captures, taken against a documentation hostname on a lab machine:
   addresses, or real external destinations. Prefer captures where addressing is loopback
   or RFC 5737 documentation ranges.
 
-> OPERATOR: capture both pcaps per `docs/method.md`, run the sanitization scan over
-> them, and commit them here with `git add -f` (the repo `.gitignore` excludes `*.pcap*`
-> by default so nothing is committed by accident).
+> _To do: capture both pcaps per `docs/method.md`, run the sanitization scan over
+> them, and add them here with `git add -f` (the repo `.gitignore` excludes `*.pcap*`
+> by default so nothing is committed by accident)._

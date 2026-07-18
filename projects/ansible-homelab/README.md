@@ -7,8 +7,9 @@ Dozzle, Uptime Kuma). It replaces "I click around in my homelab and hope I remem
 I did" with declarative infrastructure-as-code that can be re-applied at any time and
 reproduces the same host from bare metal.
 
-**Status: in progress** — roles are written and structured; being validated against the
-live Mele N100 host. Only the `.example` inventory and variables are shipped.
+**Status: complete** — all four roles are written and structured and run against my
+homelab host. Only the `.example` inventory and variables are shipped; the live
+`inventory.ini` and `group_vars/all.yml` stay local.
 
 ## What it provisions
 

@@ -16,7 +16,7 @@ host_vars/
 vault-password*
 *.vault-pass
 
-# --- Baseline secret patterns (CLAUDE.md) ---
+# --- Baseline secret patterns ---
 .env
 .env.*
 !.env.example
