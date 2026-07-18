@@ -1,0 +1,57 @@
+# headscale.yml — TEMPLATE, not yet deployed.
+# All domains, ports, and secrets below are placeholders. Copy this file,
+# fill in real values in the copy, and never commit the filled-in version.
+
+version: "3.8"
+
+services:
+  headscale:
+    image: headscale/headscale:latest
+    container_name: headscale
+    restart: unless-stopped
+    command: serve
+    volumes:
+      - ./config:/etc/headscale
+      - headscale-data:/var/lib/headscale
+    ports:
+      # Exposed only to the internal network; Caddy proxies to this from the outside.
+      - "127.0.0.1:8080:8080"   # HTTP/gRPC listener
+      - "127.0.0.1:9090:9090"   # metrics (scrape from monitoring-stack, do not expose publicly)
+    environment:
+      TZ: "UTC"
+
+  headplane:
+    image: ghcr.io/tale/headplane:latest
+    container_name: headplane
+    restart: unless-stopped
+    depends_on:
+      - headscale
+    volumes:
+      - ./headplane-config:/etc/headplane
+      # Headplane needs access to the Headscale config to manage it via the UI.
+      - ./config:/etc/headscale:ro
+    ports:
+      - "127.0.0.1:3000:3000"
+    environment:
+      # Placeholder — real cookie secret must be generated per deploy, never reused,
+      # never committed. Generate with: openssl rand -base64 32
+      COOKIE_SECRET: "CHANGE_ME_GENERATE_RANDOM_SECRET"
+      HEADSCALE_URL: "https://headscale.example.com"
+
+volumes:
+  headscale-data:
+
+# ---------------------------------------------------------------------------
+# config/config.yaml (Headscale) — NOT included here, create alongside this
+# compose file before first run. Minimum fields to set:
+#
+#   server_url: https://headscale.example.com
+#   listen_addr: 0.0.0.0:8080
+#   metrics_listen_addr: 0.0.0.0:9090
+#   dns:
+#     magic_dns: true
+#     base_domain: internal.example.com   # placeholder, not a real tailnet name
+#
+# ACL policy (if used) lives in a separate acl.hujson — ship only a template
+# with fake node/tag names, never the real policy with real hostnames.
+# ---------------------------------------------------------------------------

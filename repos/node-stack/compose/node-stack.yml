@@ -1,0 +1,74 @@
+# node-stack.yml — TEMPLATE, not yet deployed (blocked on RAM upgrade,
+# see docs/capacity-analysis.md). All credentials below are placeholders
+# pulled from environment variables — fill in real values only in a local
+# .env that is never committed.
+
+version: "3.8"
+
+services:
+  bitcoind:
+    image: bitcoin/bitcoin:latest
+    container_name: bitcoind
+    restart: unless-stopped
+    volumes:
+      - bitcoin-data:/home/bitcoin/.bitcoin
+    ports:
+      # Bind to loopback/overlay only — never expose RPC publicly.
+      - "127.0.0.1:8332:8332"   # RPC
+      - "127.0.0.1:8333:8333"   # P2P (loopback here; open on the overlay/firewall as needed)
+    environment:
+      BITCOIN_RPC_USER: "${BITCOIN_RPC_USER:?set in .env, never commit}"
+      BITCOIN_RPC_PASSWORD: "${BITCOIN_RPC_PASSWORD:?set in .env, never commit}"
+    command:
+      - "-server=1"
+      - "-txindex=1"
+      # dbcache is the primary UTXO-cache memory knob — see capacity-analysis.md
+      # for how this value should be derived from measured available RAM.
+      - "-dbcache=${BITCOIN_DBCACHE_MB:-450}"
+      - "-rpcuser=${BITCOIN_RPC_USER}"
+      - "-rpcpassword=${BITCOIN_RPC_PASSWORD}"
+      - "-rpcallowip=172.16.0.0/12"
+      - "-rpcbind=0.0.0.0"
+
+  fulcrum:
+    image: cculianu/fulcrum:latest
+    container_name: fulcrum
+    restart: unless-stopped
+    depends_on:
+      - bitcoind
+    volumes:
+      - fulcrum-data:/data
+    ports:
+      - "127.0.0.1:50001:50001"   # Electrum TCP
+      - "127.0.0.1:50002:50002"   # Electrum SSL
+    environment:
+      FULCRUM_BITCOIND_HOST: "bitcoind"
+      FULCRUM_BITCOIND_PORT: "8332"
+      FULCRUM_BITCOIND_RPC_USER: "${BITCOIN_RPC_USER:?set in .env, never commit}"
+      FULCRUM_BITCOIND_RPC_PASSWORD: "${BITCOIN_RPC_PASSWORD:?set in .env, never commit}"
+      # Fulcrum's own DB working set is a separate line item from bitcoind's
+      # dbcache — see capacity-analysis.md, this is not free once bitcoind's
+      # cache is accounted for.
+      FULCRUM_DB_MEM_MB: "${FULCRUM_DB_MEM_MB:-2000}"
+
+  monerod:
+    image: sethsimmons/simple-monerod:latest
+    container_name: monerod
+    restart: unless-stopped
+    volumes:
+      - monero-data:/home/monero/.bitmonero
+    ports:
+      - "127.0.0.1:18081:18081"   # RPC
+      - "127.0.0.1:18080:18080"   # P2P (loopback here; open as needed)
+    environment:
+      MONERO_RPC_LOGIN: "${MONERO_RPC_LOGIN:?set in .env, never commit}"
+    command:
+      - "--rpc-bind-ip=0.0.0.0"
+      - "--rpc-login=${MONERO_RPC_LOGIN}"
+      - "--confirm-external-bind"
+      - "--non-interactive"
+
+volumes:
+  bitcoin-data:
+  fulcrum-data:
+  monero-data:

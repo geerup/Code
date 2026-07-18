@@ -1,0 +1,34 @@
+[Unit]
+Description=restic backup (backup + retention prune + structural check)
+Documentation=https://restic.readthedocs.io/
+# Need the network for SFTP/B2 backends; harmless for a local repo.
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+
+# backup.sh loads all its configuration (repository, password file, paths,
+# retention) from this env file. It is the single source of truth and is NOT
+# in this repo — install it at /etc/restic-backup/restic.env, root-owned 600.
+# The script defaults to this same path, but set it explicitly for clarity.
+Environment=RESTIC_BACKUP_CONFIG=/etc/restic-backup/restic.env
+
+# Install backup.sh here (see README quick start).
+ExecStart=/usr/local/sbin/backup.sh
+
+# Backups touch a lot of files; keep them from starving interactive work.
+Nice=10
+IOSchedulingClass=idle
+
+# --- light hardening (backup must still read the whole filesystem) ---
+# ReadWritePaths is intentionally narrow: the lock file and, for a local
+# backend, the repository directory. Widen only if your repo lives elsewhere.
+NoNewPrivileges=true
+ProtectControlGroups=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ReadWritePaths=/run /srv/backups
+
+[Install]
+WantedBy=multi-user.target

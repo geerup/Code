@@ -1,0 +1,33 @@
+# --- Ansible ---
+*.retry
+.ansible/
+*.log
+
+# Real inventory and group_vars: ship .example only, never the live files.
+inventory.ini
+group_vars/all.yml
+group_vars/*.yml
+!group_vars/*.example.yml
+host_vars/
+
+# Vault password files — never commit these.
+.vault_pass
+.vault-pass
+vault-password*
+*.vault-pass
+
+# --- Baseline secret patterns (CLAUDE.md) ---
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*_rsa
+*_ed25519
+id_*
+*.wallet
+wallet.dat
+*.keys
+bitcoin.conf
+monerod.conf
+secrets/

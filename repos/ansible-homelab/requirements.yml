@@ -1,0 +1,7 @@
+---
+# Galaxy collections the roles depend on.
+#   ansible-galaxy collection install -r requirements.yml
+collections:
+  - name: community.general      # timezone module
+  - name: ansible.posix          # authorized_key module
+  - name: community.docker       # docker_compose_v2 module
