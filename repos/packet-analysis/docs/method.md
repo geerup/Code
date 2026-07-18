@@ -114,7 +114,7 @@ tshark -r socks5-leak-min.pcapng -Y 'eth.addr or ip.addr' -T fields \
 Checklist before a pcap enters `captures/`:
 
 - Addresses are loopback or RFC 5737 documentation ranges only.
-- No real SSIDs, credentials, hostnames, or tailnet (`100.64.0.0/10`) addresses.
+- No real SSIDs, credentials, hostnames, or tailnet CGNAT-range addresses.
 - No real MAC addresses.
 - File is a handful of packets, not a session.
 
