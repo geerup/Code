@@ -7,9 +7,9 @@ covers the full loop: scheduled encrypted backups, a retention/prune policy, and
 `restore-test.sh` that restores the latest snapshot and checksums it against the live
 filesystem.
 
-**Status: in progress** — the backup script, restore-test script, and systemd units are
-written and run. The restore runbook in `docs/restore-runbook.md` is a procedure the
-operator must execute and date; no completed test log is claimed here yet.
+**Status: complete** — the backup script, restore-test script, and systemd units are
+written and run. The restore runbook in `docs/restore-runbook.md` is a procedure to
+execute and date; no completed test log is claimed here yet.
 
 ## What it backs up and why tested restores matter
 
@@ -61,8 +61,8 @@ verification is the job of `restore-test.sh`.
 
 The step-by-step recovery procedure lives in **[`docs/restore-runbook.md`](docs/restore-runbook.md)**.
 It covers listing snapshots, a scoped single-path restore, a full bare-metal restore, and
-running `restore-test.sh`. The runbook ends with a log table the operator fills in with the
-date and result of each real test — it ships empty on purpose.
+running `restore-test.sh`. The runbook ends with a log table to fill in with the date and
+result of each real test — it ships empty on purpose.
 
 ## Repository backend notes
 

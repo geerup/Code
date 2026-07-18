@@ -4,7 +4,7 @@ config/
 headplane-config/
 *.local.yml
 
-# Secrets baseline (from CLAUDE.md sanitization standard)
+# Secrets baseline — never commit
 .env
 .env.*
 !.env.example
