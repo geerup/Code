@@ -1,0 +1,29 @@
+# TEMPLATE — replace with your running config (sanitized) before publishing
+#
+# Forgejo act_runner — CI executor that pulls jobs from the Forgejo instance.
+# The runner reaches Forgejo over the overlay; it exposes no inbound ports itself.
+# The registration token is a SECRET — supply it via .env, never commit a real value.
+
+services:
+  act-runner:
+    image: code.forgejo.org/forgejo/runner:6
+    container_name: act-runner
+    restart: unless-stopped
+    # Note: Forgejo runs from compose/forgejo.yml (per-service files), so there is
+    # no in-file depends_on. Start Forgejo first, then register this runner.
+    environment:
+      # Forgejo instance URL on the overlay (e.g. http://<overlay-host>:<port>).
+      FORGEJO_INSTANCE_URL: ${FORGEJO_INSTANCE_URL}
+      # One-time registration token minted in Forgejo admin. SECRET.
+      FORGEJO_RUNNER_REGISTRATION_TOKEN: ${ACT_RUNNER_TOKEN}
+      FORGEJO_RUNNER_NAME: ${ACT_RUNNER_NAME}
+      # Labels map jobs to runner capabilities (docker-in-docker host, etc.).
+      FORGEJO_RUNNER_LABELS: ${ACT_RUNNER_LABELS}
+    volumes:
+      - act-runner-data:/data
+      # Runner needs the host Docker socket to spawn job containers.
+      - /var/run/docker.sock:/var/run/docker.sock
+    # No `ports:` — the runner is outbound-only. It never listens on the network.
+
+volumes:
+  act-runner-data:

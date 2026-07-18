@@ -1,0 +1,28 @@
+# --- Secrets: never commit real values ---
+.env
+.env.*
+!.env.example
+
+# Keys / certs
+*.key
+*.pem
+*_rsa
+*_ed25519
+id_*
+
+# Wallet / crypto material
+*.wallet
+wallet.dat
+*.keys
+
+# Node RPC config
+bitcoin.conf
+monerod.conf
+
+# Secrets dirs / runtime auth files
+secrets/
+dozzle/users.yml
+
+# OS / editor cruft
+.DS_Store
+*.swp

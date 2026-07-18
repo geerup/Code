@@ -1,0 +1,32 @@
+---
+# roles/base/defaults/main.yml
+# Overridable defaults. Real values live in group_vars/all.yml (vaulted where secret).
+
+base_admin_user: admin
+# Public key installed for the admin user. Empty string skips key install.
+base_admin_ssh_pubkey: ""
+base_timezone: "Etc/UTC"
+
+# SSH hardening drop-in. Password auth is only disabled when a pubkey is set,
+# so a misconfigured run cannot lock you out (see tasks/main.yml).
+base_disable_password_auth: true
+
+# Packages installed on every host.
+base_packages:
+  - tmux
+  - htop
+  - curl
+  - git
+  - vim
+  - rsync
+  - unattended-upgrades
+
+# Rendered to /etc/tmux.conf. Kept minimal and host-wide so long-running
+# remote sessions survive SSH disconnects on unreliable links.
+base_tmux_conf: |
+  # Managed by ansible-homelab (roles/base). Do not edit by hand.
+  set -g history-limit 50000
+  set -g mouse on
+  setw -g mode-keys vi
+  set -g default-terminal "tmux-256color"
+  set -g status-interval 5

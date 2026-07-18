@@ -1,0 +1,7 @@
+---
+# roles/base/handlers/main.yml
+
+- name: Restart ssh
+  ansible.builtin.service:
+    name: "{{ base_ssh_service }}"
+    state: restarted

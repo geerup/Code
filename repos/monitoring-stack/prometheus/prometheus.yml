@@ -1,0 +1,45 @@
+# Prometheus scrape configuration for the monitoring stack.
+#
+# All targets below are PLACEHOLDERS (`*.example.internal`). Replace them with
+# your own overlay hostnames or addresses. Do not commit real hostnames/IPs.
+#
+# Scrape model: Prometheus pulls from exporters over the WireGuard overlay.
+# Exporters never need credentials or outbound access — they just expose
+# /metrics on the overlay interface and Prometheus fetches on its schedule.
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  # Prometheus self-monitoring — scrape latency/TSDB health of the server itself.
+  - job_name: prometheus
+    static_configs:
+      - targets:
+          - localhost:9090
+
+  # Host metrics: CPU, memory, filesystem, network, pressure stall info.
+  - job_name: node
+    static_configs:
+      # The host running this compose stack, scraped over the compose network.
+      - targets:
+          - node-exporter:9100
+        labels:
+          instance: node.example.internal
+      # Additional hosts running node_exporter, scraped over the overlay.
+      # Uncomment and replace with real overlay names (kept out of git):
+      # - targets:
+      #     - node2.example.internal:9100
+      #     - node3.example.internal:9100
+
+  # SMART disk health: reallocated sectors, wear level, temperature,
+  # overall SMART self-assessment per device.
+  - job_name: smartctl
+    static_configs:
+      - targets:
+          - smartctl-exporter:9633
+        labels:
+          instance: node.example.internal
+      # Remote hosts running smartctl_exporter:
+      # - targets:
+      #     - node2.example.internal:9633

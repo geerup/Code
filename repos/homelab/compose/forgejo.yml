@@ -1,0 +1,30 @@
+# TEMPLATE — replace with your running config (sanitized) before publishing
+#
+# Forgejo — self-hosted Git forge. Bound only to the WireGuard overlay address;
+# never published on 0.0.0.0. Reach it over the tailnet, not the public internet.
+
+services:
+  forgejo:
+    image: codeberg.org/forgejo/forgejo:9
+    container_name: forgejo
+    restart: unless-stopped
+    environment:
+      USER_UID: "1000"
+      USER_GID: "1000"
+      FORGEJO__database__DB_TYPE: sqlite3
+      FORGEJO__server__DOMAIN: ${FORGEJO_DOMAIN}
+      FORGEJO__server__ROOT_URL: http://${FORGEJO_DOMAIN}:${FORGEJO_HTTP_PORT}/
+      FORGEJO__server__SSH_DOMAIN: ${FORGEJO_DOMAIN}
+      # Do not run installer over an open network; keep bound to the overlay.
+      FORGEJO__security__INSTALL_LOCK: "true"
+    volumes:
+      - forgejo-data:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      # OVERLAY-ONLY BIND: bind to the WireGuard/overlay interface address, never 0.0.0.0.
+      - "${OVERLAY_BIND_ADDR}:${FORGEJO_HTTP_PORT}:3000"
+      - "${OVERLAY_BIND_ADDR}:${FORGEJO_SSH_PORT}:22"
+
+volumes:
+  forgejo-data:

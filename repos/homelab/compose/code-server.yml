@@ -1,0 +1,24 @@
+# TEMPLATE — replace with your running config (sanitized) before publishing
+#
+# code-server — VS Code in the browser, reachable only over the overlay.
+# PASSWORD is a SECRET — supply via .env, never commit a real value.
+
+services:
+  code-server:
+    image: codercom/code-server:latest
+    container_name: code-server
+    restart: unless-stopped
+    environment:
+      PASSWORD: ${CODE_SERVER_PASSWORD}
+      # Optional sudo password inside the container.
+      SUDO_PASSWORD: ${CODE_SERVER_SUDO_PASSWORD}
+    volumes:
+      - code-server-config:/home/coder/.config
+      - code-server-project:/home/coder/project
+    ports:
+      # OVERLAY-ONLY BIND: bind to the overlay interface, never 0.0.0.0.
+      - "${OVERLAY_BIND_ADDR}:${CODE_SERVER_HTTP_PORT}:8080"
+
+volumes:
+  code-server-config:
+  code-server-project:

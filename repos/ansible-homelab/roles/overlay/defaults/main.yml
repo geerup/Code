@@ -1,0 +1,14 @@
+---
+# roles/overlay/defaults/main.yml
+
+# One-time-use, pre-expiring preauth key. NEVER a real value here — this is a
+# placeholder default. Set the real key vault-encrypted in group_vars/all.yml:
+#   ansible-vault encrypt_string 'tskey-REAL' --name 'overlay_auth_key'
+overlay_auth_key: ""
+
+# Extra flags appended to `tailscale up`, e.g. to point at a self-hosted
+# Headscale control plane: "--login-server=https://headscale.example.com".
+overlay_up_extra_args: ""
+
+# Advertise no routes / accept no routes by default. Override per-host.
+overlay_accept_routes: false

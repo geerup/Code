@@ -1,0 +1,5 @@
+---
+# roles/base/vars/main.yml
+# Internal role vars (not meant to be overridden per-host).
+
+base_ssh_service: ssh

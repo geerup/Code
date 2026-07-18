@@ -1,0 +1,25 @@
+# --- secrets (never commit) ---
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*_rsa
+*_ed25519
+id_*
+*.wallet
+wallet.dat
+*.keys
+bitcoin.conf
+monerod.conf
+secrets/
+
+# --- runtime data dirs (bind-mounted / named volumes) ---
+prometheus/data/
+prometheus-data/
+grafana/data/
+grafana-data/
+
+# --- os / editor cruft ---
+.DS_Store
+*.swp
