@@ -26,7 +26,7 @@ Two tiny captures, taken against a documentation hostname on a lab machine:
 - **Tiny.** Trim to just the packets that make the point (a handful, not a session).
   See the truncation/slicing steps in `method.md`.
 - **Sanitized and verified.** Before committing, confirm the capture contains no real
-  SSIDs, credentials, LAN addressing, MAC addresses, tailnet (`100.64.0.0/10`)
+  SSIDs, credentials, LAN addressing, MAC addresses, tailnet CGNAT-range
   addresses, or real external destinations. Prefer captures where addressing is loopback
   or RFC 5737 documentation ranges.
 

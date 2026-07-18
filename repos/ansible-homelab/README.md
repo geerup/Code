@@ -41,7 +41,7 @@ cp inventory.example.ini inventory.ini
 cp group_vars/all.example.yml group_vars/all.yml
 
 # 2. Vault-encrypt the secrets in group_vars/all.yml (at minimum overlay_auth_key).
-ansible-vault encrypt_string 'tskey-REAL-PREAUTH-KEY' --name 'overlay_auth_key'
+ansible-vault encrypt_string 'YOUR-PREAUTH-KEY' --name 'overlay_auth_key'
 
 # 3. Converge everything.
 ansible-playbook -i inventory.example.ini site.yml --ask-vault-pass

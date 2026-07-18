@@ -3,7 +3,7 @@
 
 # One-time-use, pre-expiring preauth key. NEVER a real value here — this is a
 # placeholder default. Set the real key vault-encrypted in group_vars/all.yml:
-#   ansible-vault encrypt_string 'tskey-REAL' --name 'overlay_auth_key'
+#   ansible-vault encrypt_string 'YOUR-PREAUTH-KEY' --name 'overlay_auth_key'
 overlay_auth_key: ""
 
 # Extra flags appended to `tailscale up`, e.g. to point at a self-hosted
