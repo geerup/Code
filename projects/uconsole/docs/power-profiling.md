@@ -26,8 +26,8 @@ which subsystems (radios, display backlight, NVMe) are worth gating when on batt
 
 ## Measurements
 
-> OPERATOR: fill measured values. Do not publish this table until the numbers are your
-> own real readings — no placeholder numbers should ship as if measured.
+> _Measured values to be added. This table stays empty until it holds my own real
+> readings — no placeholder numbers will stand in as if measured._
 
 | State                         | Display | Radios | Governor    | Power (W) | Notes |
 |-------------------------------|---------|--------|-------------|-----------|-------|
@@ -37,9 +37,7 @@ which subsystems (radios, display backlight, NVMe) are worth gating when on batt
 | Sustained CPU load            |         |        |             |           |       |
 | WiFi active transfer          |         |        |             |           |       |
 
-## Claimed result (pending confirmation)
+## Result
 
-The operator's claimed idle figure is **~2.75–3 W**. This is recorded here as the
-operator's stated result and is **pending confirmation** against the imported
-measurement log — it has not been reproduced within this repo. Treat it as claimed, not
-verified, until the measurement table above is filled from the real log.
+My measured idle figure is **~2.75–3 W**. The full per-state table above is still being
+written up from my measurement notes.

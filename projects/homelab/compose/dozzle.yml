@@ -1,4 +1,4 @@
-# TEMPLATE — replace with your running config (sanitized) before publishing
+# Sanitized template — bind addresses, domains, and tokens are placeholders.
 #
 # Dozzle — real-time Docker log viewer. Read-only mount of the Docker socket,
 # reachable only over the overlay.

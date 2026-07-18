@@ -17,8 +17,8 @@ connection. It's meant to sit in front of `kiwix-serve` rather than replace it.
 
 ## Screenshot
 
-*(placeholder — a screenshot of the live guide goes here once imported; scrub any
-visible hostnames or local IPs from the image before committing)*
+*(placeholder — a screenshot of the live guide goes here once the front-end is added;
+scrub any visible hostnames or local IPs from the image before committing)*
 
 `docs/screenshot.png` — not yet added.
 
@@ -31,7 +31,7 @@ visible hostnames or local IPs from the image before committing)*
    ```
 2. Open `guide.html` in a browser and confirm the links in it match the `kiwix-serve`
    base URL — by default that's `http://localhost:8080`. The shipped `guide.html` is a
-   placeholder; see the `OPERATOR` comment inside it for the exact fields to fill in.
+   placeholder; see the comment inside it for the fields the real front-end needs to fill in.
 3. For serving `guide.html` itself, any static file server works (`kiwix-serve` can also
    serve a custom landing page via its `--customindex` option; see `kiwix-setup.md`).
 

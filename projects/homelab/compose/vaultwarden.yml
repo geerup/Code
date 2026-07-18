@@ -1,4 +1,4 @@
-# TEMPLATE — replace with your running config (sanitized) before publishing
+# Sanitized template — bind addresses, domains, and tokens are placeholders.
 #
 # Vaultwarden — Bitwarden-compatible secrets manager. This holds real credentials,
 # so it is the service that most needs zero public exposure: overlay bind only.

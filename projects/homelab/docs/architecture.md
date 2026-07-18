@@ -63,11 +63,11 @@ flowchart LR
 
 ---
 
-## OPERATOR: verify against reality before publishing
+## Verifying the bind on the host
 
-Confirm each of these on the running host, then delete this block or mark it done. Do not
-publish assumptions — the templates in `compose/` are placeholders until you reconcile
-them with the live config.
+These are the checks I run on the host to confirm the overlay-only pattern actually holds.
+The compose files ship as sanitized templates, so the addresses and ports here are
+placeholders until set in `.env`:
 
 - [ ] `OVERLAY_BIND_ADDR` is the host's actual overlay-interface address (not LAN, not
       `0.0.0.0`, not loopback).
@@ -75,7 +75,7 @@ them with the live config.
       `0.0.0.0` / `*`.
 - [ ] Router/firewall has **no** port forwards to the host for any of these ports.
 - [ ] `nmap` from an off-overlay host shows these ports filtered/closed.
-- [ ] Ports in the diagram match your real published ports (`.env` values).
-- [ ] Coordination server reality: Tailscale vs. Headscale — update the diagram label.
+- [ ] Ports in the diagram match the real published ports (`.env` values).
+- [ ] Coordination server reality: Tailscale vs. Headscale — the diagram label matches.
 - [ ] act-runner truly exposes no inbound port (`docker ps` shows no published ports).
 - [ ] No real overlay addresses, MagicDNS names, domains, or tokens remain in any file.

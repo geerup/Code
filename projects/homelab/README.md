@@ -6,19 +6,19 @@ internet. It solves the usual self-hosting problem — how to reach your own ser
 remotely without opening ports to the world — by making overlay membership, not port
 forwarding, the sole path in.
 
-Status: running (repo import in progress — templates pending replacement with sanitized running config)
+Status: running (the compose files here are sanitized templates — placeholders for bind addresses, domains, and tokens)
 
 The compose files in `compose/` are sanitized templates carrying placeholders
-(`${OVERLAY_BIND_ADDR}`, `${*_TOKEN}`, etc.). The operator replaces them with the real,
-sanitized running config before this repo goes public. Each file is marked with a
-`# TEMPLATE — replace with your running config (sanitized) before publishing` header.
+(`${OVERLAY_BIND_ADDR}`, `${*_TOKEN}`, etc.). Supply your own bind address, domains, and
+tokens through `.env` to run them. Each file carries a `# Sanitized template` header as a
+reminder that the values are placeholders.
 
 ## Architecture
 
 Every service publishes its port to `${OVERLAY_BIND_ADDR}` — the host's address on the
 WireGuard/Tailscale overlay interface — and never to `0.0.0.0`. The home router has no
 port forwards to any of these services. See [`docs/architecture.md`](docs/architecture.md)
-for the network diagram and the operator verification checklist.
+for the network diagram and how to verify the bind on the host.
 
 ### The key decision: overlay-only bind, no port forwards
 
@@ -111,5 +111,5 @@ change the pattern here: services still bind to the overlay address only.
 - **Signups closed.** Vaultwarden `SIGNUPS_ALLOWED=false`; new users are invited from the
   admin panel over the overlay.
 
-Before this repo is made public, the operator must reconcile the templates with the live
-config and complete the verification checklist in `docs/architecture.md`.
+The compose files ship as sanitized templates; `docs/architecture.md` lists the checks I
+run on the host to confirm every listener is overlay-only and nothing is forwarded.

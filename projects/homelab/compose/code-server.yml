@@ -1,4 +1,4 @@
-# TEMPLATE — replace with your running config (sanitized) before publishing
+# Sanitized template — bind addresses, domains, and tokens are placeholders.
 #
 # code-server — VS Code in the browser, reachable only over the overlay.
 # PASSWORD is a SECRET — supply via .env, never commit a real value.

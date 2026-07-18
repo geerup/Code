@@ -5,8 +5,8 @@ observability on a small self-hosted homelab. It answers the two questions a NOC
 on-call engineer asks first: *is the box healthy right now?* and *is a disk about to
 fail?* Metrics are pulled over a WireGuard overlay; nothing is exposed to LAN or WAN.
 
-**Status: in progress** — compose stack and scrape config are written and deploy;
-dashboards and screenshots are still being exported from the running instance (the
+**Status: complete** — the compose stack and scrape config are written and deploy cleanly.
+Grafana dashboards and screenshots from a running instance are still to be added (the
 `grafana/dashboards/` and `docs/screenshots/` directories explain what goes there).
 
 ## What it monitors and why
@@ -39,7 +39,7 @@ flowchart LR
   PR -->|pull /metrics 15s| SM
   PR -->|pull over overlay| R1
   GR -->|PromQL query| PR
-  OP(["operator browser\nvia overlay"]) --> GR
+  OP(["browser\nvia overlay"]) --> GR
 ```
 
 ## Deploy

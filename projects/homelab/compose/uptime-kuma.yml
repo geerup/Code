@@ -1,4 +1,4 @@
-# TEMPLATE — replace with your running config (sanitized) before publishing
+# Sanitized template — bind addresses, domains, and tokens are placeholders.
 #
 # Uptime Kuma — status/monitoring dashboard. Probes services on the overlay and
 # is itself reachable only over the overlay.

@@ -7,23 +7,23 @@ sync or indexing?
 
 **This document is a structured skeleton.** The category breakdown, formulas, and
 what needs to be measured are filled in. The actual numbers are not — they have to
-come from the operator's real hardware and real measurements, not be invented here.
+come from my own hardware and real measurements, not be invented here.
 
-> OPERATOR: fill in your measured/derived numbers wherever this marker appears.
-> Do not deploy against estimates alone — validate against `free -m` / `docker stats`
-> during an actual sync before trusting the plan.
+> _To be filled in with measured/derived numbers wherever this marker appears._
+> _Not to be trusted against estimates alone — I plan to validate against `free -m` /
+> `docker stats` during an actual sync before relying on the plan._
 
 ## 1. Target hardware
 
-> OPERATOR: fill in — total RAM installed, RAM after the planned upgrade, CPU, storage
+> _To be filled in — total RAM installed, RAM after the planned upgrade, CPU, storage
 > type (SSD/NVMe/HDD — matters a lot for bitcoind/Fulcrum I/O patterns if RAM is tight
-> and swap gets touched at all).
+> and swap gets touched at all)._
 
 | Spec | Current | After upgrade |
 |---|---|---|
-| Total RAM | > OPERATOR: fill in | > OPERATOR: fill in |
-| Storage | > OPERATOR: fill in | — |
-| Other concurrent workloads on this host | > OPERATOR: fill in (e.g. homelab compose stack, monitoring-stack) | — |
+| Total RAM | _to be measured_ | _to be measured_ |
+| Storage | _to be measured_ | — |
+| Other concurrent workloads on this host | _to be measured (e.g. homelab compose stack, monitoring-stack)_ | — |
 
 ## 2. Working-set components
 
@@ -35,17 +35,17 @@ come from the operator's real hardware and real measurements, not be invented he
 - **Non-cache overhead**: mempool, connection/peer state, indexes if enabled
   (`-txindex=1` adds a meaningful additional index on top of the base chainstate).
 
-> OPERATOR: fill in — planned `dbcache` value, measured RSS of the `bitcoind` process
-> at that setting (idle, and during a sync if you have that data), whether
+> _To be filled in — planned `dbcache` value, measured RSS of the `bitcoind` process
+> at that setting (idle, and during a sync if I have that data), whether
 > `-txindex` is actually needed for this stack (Fulcrum builds its own index — confirm
 > whether bitcoind-level txindex is redundant with Fulcrum's own indexing before
-> assuming you need both).
+> assuming both are needed)._
 
 | Component | Value |
 |---|---|
-| Configured `dbcache` | > OPERATOR: fill in |
-| Measured/estimated bitcoind RSS | > OPERATOR: fill in |
-| `-txindex` enabled? Why/why not | > OPERATOR: fill in |
+| Configured `dbcache` | _to be measured_ |
+| Measured/estimated bitcoind RSS | _to be measured_ |
+| `-txindex` enabled? Why/why not | _to be determined_ |
 
 ### 2b. Fulcrum
 
@@ -55,15 +55,15 @@ come from the operator's real hardware and real measurements, not be invented he
 - Initial sync (Fulcrum indexing the full chain from bitcoind) is itself a
   memory-and-I/O-intensive one-time operation, distinct from steady-state serving load.
 
-> OPERATOR: fill in — Fulcrum's documented/observed memory footprint for the DB cache
-> setting you plan to use, and whether you're sizing for "keep up with bitcoind sync"
-> vs. "steady-state serving only" (initial sync is the peak).
+> _To be filled in — Fulcrum's documented/observed memory footprint for the DB cache
+> setting I plan to use, and whether I'm sizing for "keep up with bitcoind sync"
+> vs. "steady-state serving only" (initial sync is the peak)._
 
 | Component | Value |
 |---|---|
-| Configured DB memory setting | > OPERATOR: fill in |
-| Measured/estimated Fulcrum RSS (initial sync peak) | > OPERATOR: fill in |
-| Measured/estimated Fulcrum RSS (steady state) | > OPERATOR: fill in |
+| Configured DB memory setting | _to be measured_ |
+| Measured/estimated Fulcrum RSS (initial sync peak) | _to be measured_ |
+| Measured/estimated Fulcrum RSS (steady state) | _to be measured_ |
 
 ### 2c. monerod
 
@@ -71,29 +71,29 @@ come from the operator's real hardware and real measurements, not be invented he
   memory profile from Bitcoin Core, needs its own measurement rather than assuming
   parity.
 
-> OPERATOR: fill in — measured/documented monerod RSS at whatever DB sync mode
-  (fast/safe) you plan to run.
+> _To be filled in — measured/documented monerod RSS at whatever DB sync mode
+> (fast/safe) I plan to run._
 
 | Component | Value |
 |---|---|
-| DB sync mode | > OPERATOR: fill in |
-| Measured/estimated monerod RSS | > OPERATOR: fill in |
+| DB sync mode | _to be determined_ |
+| Measured/estimated monerod RSS | _to be measured_ |
 
 ## 3. Combined working set vs. available RAM
 
-> OPERATOR: fill in the sum of the three components above, plus OS/other-workload
-> overhead, and compare against total RAM (current and post-upgrade). This is the
-> actual conclusion of the analysis — do not skip filling this in even after the RAM
-> upgrade; re-validate against real measurements once deployed.
+> _To be filled in — the sum of the three components above, plus OS/other-workload
+> overhead, compared against total RAM (current and post-upgrade). This is the
+> actual conclusion of the analysis — still to be filled in even after the RAM
+> upgrade, and re-validated against real measurements once deployed._
 
 | | Current RAM | Post-upgrade RAM |
 |---|---|---|
-| bitcoind | > OPERATOR: fill in | > OPERATOR: fill in |
-| Fulcrum | > OPERATOR: fill in | > OPERATOR: fill in |
-| monerod | > OPERATOR: fill in | > OPERATOR: fill in |
-| OS + other workloads headroom | > OPERATOR: fill in | > OPERATOR: fill in |
-| **Total working set** | > OPERATOR: fill in | > OPERATOR: fill in |
-| **Fits without swap?** | > OPERATOR: fill in (expected: no — this is the blocker) | > OPERATOR: fill in (expected: yes, validate) |
+| bitcoind | _to be measured_ | _to be measured_ |
+| Fulcrum | _to be measured_ | _to be measured_ |
+| monerod | _to be measured_ | _to be measured_ |
+| OS + other workloads headroom | _to be measured_ | _to be measured_ |
+| **Total working set** | _to be measured_ | _to be measured_ |
+| **Fits without swap?** | _to be determined (expected: no — this is the blocker)_ | _to be determined (expected: yes, validate)_ |
 
 ## 4. Why this matters / what happens if ignored
 
@@ -115,7 +115,7 @@ rather than deploying now and hoping.
 
 ## 5. Conclusion
 
-> OPERATOR: fill in once the numbers above are populated — restate the binding
+> _To be filled in once the numbers above are populated — restate the binding
 > constraint plainly (e.g. "current RAM: X GB; working set: Y GB; upgrade to Z GB
 > resolves it with N GB headroom") and confirm the upgrade target is sufficient before
-> deployment.
+> deployment._

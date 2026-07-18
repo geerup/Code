@@ -1,4 +1,4 @@
-# TEMPLATE — replace with your running config (sanitized) before publishing
+# Sanitized template — bind addresses, domains, and tokens are placeholders.
 #
 # Forgejo — self-hosted Git forge. Bound only to the WireGuard overlay address;
 # never published on 0.0.0.0. Reach it over the tailnet, not the public internet.

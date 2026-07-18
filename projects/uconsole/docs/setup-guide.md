@@ -1,31 +1,30 @@
 # Setup / operations guide
 
-The living setup and operations guide for this uConsole build. This file is the merged,
-cleaned home for the operator's own setup reference and the two markdown build guides.
+The living setup and operations guide for this uConsole build, consolidating my own setup
+notes and build guides.
 
-> OPERATOR: import from your setup reference (`~/Desktop/uConsole_Setup_Reference.txt`
-> and `/mnt/user-data/outputs/*.md`). Do not paraphrase from memory — paste the real
-> steps you ran so the guide matches the device.
+> _Section to be expanded from my build notes, using the real steps I ran so the guide
+> matches the device._
 
 ## OS image and base install
 
-> OPERATOR: import the exact OS image (distro, kernel, image date) and the flashing
-> procedure you used.
+> _To be added: the exact OS image (distro, kernel, image date) and the flashing
+> procedure I used._
 
 ## First-boot configuration
 
-> OPERATOR: import your first-boot steps (locale, user, hostname policy, package
-> baseline). Scrub any real hostnames, SSIDs, or tailnet references before import.
+> _To be added: first-boot steps (locale, user, hostname policy, package baseline), with
+> any real hostnames, SSIDs, or tailnet references scrubbed._
 
 ## Networking bring-up
 
-> OPERATOR: import how the radios are brought up and which interfaces map to which
-> antenna. No real SSIDs or WiFi credentials — reference `wpa_supplicant`/NetworkManager
-> config by placeholder only.
+> _To be added: how the radios are brought up and which interfaces map to which antenna.
+> No real SSIDs or WiFi credentials — `wpa_supplicant`/NetworkManager config referenced
+> by placeholder only._
 
 ## Software stack
 
-> OPERATOR: import the installed package/service list and any custom units.
+> _To be added: the installed package/service list and any custom units._
 
 ## Related documents
 

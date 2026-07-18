@@ -1,4 +1,4 @@
-# TEMPLATE — replace with your running config (sanitized) before publishing
+# Sanitized template — bind addresses, domains, and tokens are placeholders.
 #
 # Forgejo act_runner — CI executor that pulls jobs from the Forgejo instance.
 # The runner reaches Forgejo over the overlay; it exposes no inbound ports itself.
