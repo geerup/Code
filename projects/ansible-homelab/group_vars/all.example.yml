@@ -1,0 +1,55 @@
+---
+# Example variables — copy to group_vars/all.yml and edit.
+# group_vars/all.yml is gitignored: it will contain vault-encrypted secrets.
+#
+# Encrypt the secret values in place with:
+#   ansible-vault encrypt_string 'REPLACE_WITH_REAL_VALUE' --name 'overlay_auth_key'
+# and paste the result into group_vars/all.yml.
+
+# ------------------------------------------------------------------ base ----
+base_admin_user: admin
+# Public key installed for the admin user. Leave empty to skip.
+base_admin_ssh_pubkey: "ssh-ed25519 AAAA_REPLACE_WITH_YOUR_PUBLIC_KEY you@example"
+base_timezone: "America/New_York"
+
+# SSH hardening drop-in. Only disable password auth once the pubkey above
+# works — the role refuses to lock you out if no pubkey is set.
+base_disable_password_auth: true
+
+base_packages:
+  - tmux
+  - htop
+  - curl
+  - git
+  - vim
+  - rsync
+  - unattended-upgrades
+
+# --------------------------------------------------------------- overlay ----
+# One-time-use, pre-expiring key generated in the Tailscale admin console
+# (or from Headscale: `headscale preauthkeys create ...`).
+# NEVER a plaintext real value here — vault-encrypt it in group_vars/all.yml.
+overlay_auth_key: "REPLACE_WITH_OVERLAY_PREAUTH_KEY"
+# Extra flags for `tailscale up` (e.g. "--login-server=https://headscale.example.com"
+# when pointing at a self-hosted control plane).
+overlay_up_extra_args: ""
+
+# -------------------------------------------------------------- services ----
+services_project_dir: /opt/homelab
+# Address the containers bind to. Default binds loopback only; set this to the
+# host's overlay interface address so services are reachable over the tailnet
+# but never exposed publicly. (Placeholder on purpose — use your own.)
+services_bind_addr: "127.0.0.1"
+
+# Forgejo act_runner registration token — generate in the Forgejo admin UI
+# after first boot, then vault-encrypt. Empty string skips the runner container.
+services_runner_token: ""
+
+# Pinned image tags: upgrades are a deliberate git change, not a surprise.
+services_images:
+  forgejo: codeberg.org/forgejo/forgejo:9
+  act_runner: code.forgejo.org/forgejo/runner:6
+  vaultwarden: vaultwarden/server:1.32.5
+  code_server: lscr.io/linuxserver/code-server:4.96.2
+  dozzle: amir20/dozzle:v8.9.1
+  uptime_kuma: louislam/uptime-kuma:1.23.16

@@ -1,0 +1,17 @@
+---
+# roles/docker/defaults/main.yml
+
+# apt repo channel: stable | test | nightly
+docker_apt_channel: stable
+
+# Users added to the docker group (can talk to the daemon without sudo).
+docker_users:
+  - "{{ base_admin_user | default('admin') }}"
+
+# Daemon config written to /etc/docker/daemon.json. Log rotation on by default
+# so container logs cannot fill the disk on a long-running host.
+docker_daemon_options:
+  log-driver: json-file
+  log-opts:
+    max-size: "10m"
+    max-file: "3"

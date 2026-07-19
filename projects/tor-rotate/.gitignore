@@ -1,0 +1,29 @@
+# --- secrets: never commit (baseline) ---------------------------------------
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*_rsa
+*_ed25519
+id_*
+*.wallet
+wallet.dat
+*.keys
+bitcoin.conf
+monerod.conf
+secrets/
+
+# --- tor control-port auth material -----------------------------------------
+# Real control-port cookies and any file holding a control password.
+control_auth_cookie
+*.authcookie
+control.authcookie
+torrc.local
+*control-passwd*
+*control_password*
+
+# --- runtime / local state ---------------------------------------------------
+tor-rotate-*/
+*.pid
+*.log

@@ -1,0 +1,24 @@
+# Secrets — never commit (baseline portfolio patterns)
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*_rsa
+*_ed25519
+id_*
+*.wallet
+wallet.dat
+*.keys
+bitcoin.conf
+monerod.conf
+secrets/
+
+# WiFi / network config that may carry credentials
+wpa_supplicant.conf
+*.nmconnection
+
+# OS / editor cruft
+.DS_Store
+*.swp
+*~

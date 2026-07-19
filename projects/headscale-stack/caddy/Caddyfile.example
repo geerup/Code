@@ -1,0 +1,20 @@
+# Caddyfile.example — TEMPLATE, not yet deployed.
+# Copy to Caddyfile, replace the placeholder domain with a real one you control,
+# and never commit the filled-in version (it's gitignored below anyway).
+
+headscale.example.com {
+	# Caddy handles TLS automatically via Let's Encrypt for the domain above.
+	reverse_proxy 127.0.0.1:8080
+}
+
+headplane.example.com {
+	reverse_proxy 127.0.0.1:3000
+}
+
+# Notes:
+# - Both hostnames must have public DNS A/AAAA records pointing at this host
+#   before Caddy can issue certificates.
+# - Keep Headscale's gRPC/metrics port (9090) off this proxy — it's for internal
+#   scraping only, not for public exposure.
+# - If running behind another reverse proxy or a CDN, disable Caddy's automatic
+#   HTTPS and terminate TLS upstream instead — don't double-terminate.

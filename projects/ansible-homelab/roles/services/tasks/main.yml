@@ -1,0 +1,36 @@
+---
+# roles/services/tasks/main.yml
+# Render the compose stack and converge it. Idempotent: the template only
+# reports changed when the rendered file differs, and `docker compose up -d`
+# is a no-op when running containers already match the compose spec.
+
+- name: Ensure the project directory exists
+  ansible.builtin.file:
+    path: "{{ services_project_dir }}"
+    state: directory
+    owner: "{{ base_admin_user | default('admin') }}"
+    group: "{{ base_admin_user | default('admin') }}"
+    mode: "0750"
+
+- name: Render the compose file
+  ansible.builtin.template:
+    src: compose.yml.j2
+    dest: "{{ services_project_dir }}/compose.yml"
+    owner: "{{ base_admin_user | default('admin') }}"
+    group: "{{ base_admin_user | default('admin') }}"
+    mode: "0640"
+  register: services_compose
+
+- name: Pull images and bring the stack up
+  community.docker.docker_compose_v2:
+    project_src: "{{ services_project_dir }}"
+    files:
+      - compose.yml
+    pull: missing
+    state: present
+  register: services_up
+
+- name: Report converged services
+  ansible.builtin.debug:
+    msg: "Compose stack converged in {{ services_project_dir }}."
+  when: services_up is changed

@@ -1,0 +1,19 @@
+[Unit]
+Description=Daily restic backup timer
+Documentation=https://www.freedesktop.org/software/systemd/man/systemd.timer.html
+
+[Timer]
+# Fire daily at 02:00 local time, spread by up to an hour so the run does not
+# start at a predictable instant.
+OnCalendar=*-*-* 02:00:00
+RandomizedDelaySec=1h
+
+# If the machine was off at the scheduled time, run as soon as it is back up
+# instead of silently skipping the window (the main reason for timers over cron).
+Persistent=true
+
+# Starts restic-backup.service (same base name).
+Unit=restic-backup.service
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,70 @@
+---
+# roles/base/tasks/main.yml
+# Packages, admin user, SSH hardening, tmux. Idempotent: every task converges
+# to a declared end state and reports changed only when it actually changes.
+
+- name: Set the system timezone
+  community.general.timezone:
+    name: "{{ base_timezone }}"
+
+- name: Update apt cache (once per hour) and install base packages
+  ansible.builtin.apt:
+    name: "{{ base_packages }}"
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Ensure the admin user exists
+  ansible.builtin.user:
+    name: "{{ base_admin_user }}"
+    shell: /bin/bash
+    groups: sudo
+    append: true
+    create_home: true
+
+- name: Install the admin user's authorized key
+  ansible.posix.authorized_key:
+    user: "{{ base_admin_user }}"
+    key: "{{ base_admin_ssh_pubkey }}"
+    state: present
+  when: base_admin_ssh_pubkey | length > 0
+
+- name: Grant the admin user passwordless sudo
+  ansible.builtin.copy:
+    dest: "/etc/sudoers.d/90-{{ base_admin_user }}"
+    content: "{{ base_admin_user }} ALL=(ALL) NOPASSWD:ALL\n"
+    owner: root
+    group: root
+    mode: "0440"
+    validate: "visudo -cf %s"
+
+- name: Deploy the host-wide tmux configuration
+  ansible.builtin.copy:
+    dest: /etc/tmux.conf
+    content: "{{ base_tmux_conf }}"
+    owner: root
+    group: root
+    mode: "0644"
+
+# SSH hardening. Refuse to disable password auth unless a key is actually
+# installed, otherwise the next reconnect could be locked out.
+- name: Harden sshd (disable root login, disable password auth)
+  ansible.builtin.copy:
+    dest: /etc/ssh/sshd_config.d/10-hardening.conf
+    content: |
+      # Managed by ansible-homelab (roles/base). Do not edit by hand.
+      PermitRootLogin no
+      PasswordAuthentication {{ 'no' if (base_disable_password_auth and base_admin_ssh_pubkey | length > 0) else 'yes' }}
+      ChallengeResponseAuthentication no
+      X11Forwarding no
+    owner: root
+    group: root
+    mode: "0644"
+    validate: "sshd -t -f %s"
+  notify: Restart ssh
+
+- name: Enable unattended-upgrades
+  ansible.builtin.service:
+    name: unattended-upgrades
+    enabled: true
+    state: started

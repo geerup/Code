@@ -1,0 +1,72 @@
+# Managed by ansible-homelab (roles/services). Do not edit by hand.
+# Every port is bound to {{ services_bind_addr }} only — no public exposure.
+---
+services:
+  forgejo:
+    image: {{ services_images.forgejo }}
+    container_name: forgejo
+    restart: unless-stopped
+    volumes:
+      - forgejo_data:/data
+    ports:
+      - "{{ services_bind_addr }}:3000:3000"
+
+{% if services_runner_token | length > 0 %}
+  act_runner:
+    image: {{ services_images.act_runner }}
+    container_name: act_runner
+    restart: unless-stopped
+    depends_on:
+      - forgejo
+    environment:
+      FORGEJO_INSTANCE_URL: "http://forgejo:3000"
+      FORGEJO_RUNNER_REGISTRATION_TOKEN: "{{ services_runner_token }}"
+    volumes:
+      - act_runner_data:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+{% endif %}
+
+  vaultwarden:
+    image: {{ services_images.vaultwarden }}
+    container_name: vaultwarden
+    restart: unless-stopped
+    volumes:
+      - vaultwarden_data:/data
+    ports:
+      - "{{ services_bind_addr }}:8080:80"
+
+  code_server:
+    image: {{ services_images.code_server }}
+    container_name: code_server
+    restart: unless-stopped
+    volumes:
+      - code_server_config:/config
+    ports:
+      - "{{ services_bind_addr }}:8443:8443"
+
+  dozzle:
+    image: {{ services_images.dozzle }}
+    container_name: dozzle
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - "{{ services_bind_addr }}:9999:8080"
+
+  uptime_kuma:
+    image: {{ services_images.uptime_kuma }}
+    container_name: uptime_kuma
+    restart: unless-stopped
+    volumes:
+      - uptime_kuma_data:/app/data
+    ports:
+      - "{{ services_bind_addr }}:3001:3001"
+
+volumes:
+  forgejo_data:
+{% if services_runner_token | length > 0 %}
+  act_runner_data:
+{% endif %}
+  vaultwarden_data:
+  code_server_config:
+  uptime_kuma_data:

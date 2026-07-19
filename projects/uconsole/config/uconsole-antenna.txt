@@ -1,0 +1,18 @@
+# Generic device-tree parameter example — antenna path selection
+#
+# This is an ILLUSTRATIVE, generic example, not this device's live config.
+# Some CM4/Pi WiFi setups expose an antenna selector via a device-tree parameter.
+# On boards that support it, selecting the external antenna path looks like:
+#
+#   dtparam=ant2
+#
+# where `ant1` typically selects the onboard/PCB antenna and `ant2` selects the
+# external connector. The exact parameter name and available values depend on the
+# board and its device-tree overlay — confirm against your board's overlay docs.
+#
+# Placement: parameters like this go in the firmware config file the bootloader reads
+# (e.g. /boot/firmware/config.txt on current Raspberry Pi OS layouts).
+#
+# > _To be added: the actual parameter(s) this build uses, which physical connector each
+# > value maps to, and which radio it applies to. This generic example will be replaced
+# > only with values verified on the device._

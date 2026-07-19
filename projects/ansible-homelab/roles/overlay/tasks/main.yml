@@ -1,0 +1,61 @@
+---
+# roles/overlay/tasks/main.yml
+# Bring up the Tailscale/Headscale overlay client. Idempotent: install converges
+# apt state, and `tailscale up` only runs when the node is not already connected.
+
+- name: Fail early if no overlay auth key is provided
+  ansible.builtin.assert:
+    that:
+      - overlay_auth_key | length > 0
+    fail_msg: >-
+      overlay_auth_key is empty. Set it (vault-encrypted) in group_vars/all.yml
+      before running the overlay role. It is intentionally empty by default so a
+      placeholder key is never used.
+    quiet: true
+
+- name: Add the Tailscale apt signing key
+  ansible.builtin.get_url:
+    url: "https://pkgs.tailscale.com/stable/debian/{{ ansible_distribution_release }}.noarmor.gpg"
+    dest: /etc/apt/keyrings/tailscale-archive-keyring.gpg
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Add the Tailscale apt repository
+  ansible.builtin.get_url:
+    url: "https://pkgs.tailscale.com/stable/debian/{{ ansible_distribution_release }}.tailscale-keyring.list"
+    dest: /etc/apt/sources.list.d/tailscale.list
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Install the Tailscale client
+  ansible.builtin.apt:
+    name: tailscale
+    state: present
+    update_cache: true
+
+- name: Enable and start the tailscaled service
+  ansible.builtin.service:
+    name: tailscaled
+    enabled: true
+    state: started
+
+# `tailscale status` exits non-zero when the node is not connected/logged in.
+# We use that as the change gate so `tailscale up` is not re-run every play.
+- name: Check whether the node is already connected to the overlay
+  ansible.builtin.command: tailscale status
+  register: overlay_status
+  changed_when: false
+  failed_when: false
+
+- name: Bring the node up on the overlay
+  ansible.builtin.command: >-
+    tailscale up
+    --authkey={{ overlay_auth_key }}
+    {{ '--accept-routes' if overlay_accept_routes else '' }}
+    {{ overlay_up_extra_args }}
+  when: overlay_status.rc != 0
+  register: overlay_up
+  changed_when: overlay_up.rc == 0
+  no_log: true   # keep the auth key out of logs/output

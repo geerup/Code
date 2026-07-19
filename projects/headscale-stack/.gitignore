@@ -1,0 +1,27 @@
+# Real, filled-in configs — never commit these, only the .example/.local templates
+Caddyfile
+config/
+headplane-config/
+*.local.yml
+
+# Secrets baseline — never commit
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*_rsa
+*_ed25519
+id_*
+*.wallet
+wallet.dat
+*.keys
+bitcoin.conf
+monerod.conf
+secrets/
+
+# Headscale/Tailscale-specific
+acl.hujson
+noise_private.key
+*.hujson
+preauthkey*

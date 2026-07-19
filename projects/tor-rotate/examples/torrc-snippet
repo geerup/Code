@@ -1,0 +1,39 @@
+# Example torrc snippet: enable the control port with cookie authentication.
+#
+# This is a SAMPLE. Paths are placeholders — adjust to match your distro's Tor
+# packaging (Debian/Ubuntu use the debian-tor user and /run/tor; other distros differ).
+# Do NOT commit a real HashedControlPassword or a real cookie file.
+
+# --- Control port -------------------------------------------------------------
+# Listen for control connections on loopback only. Never expose the control port
+# to the network — anyone who can reach it can drive your Tor client.
+ControlPort 9051
+
+# --- Authentication (choose ONE of the two below) -----------------------------
+
+# Option A: cookie authentication (recommended for local automation).
+# Tor writes a per-session cookie file; only processes that can read it can
+# authenticate. tor-rotate.sh reads this cookie automatically.
+CookieAuthentication 1
+# Optional: make the cookie group-readable so a non-root automation user in the
+# tor group can read it. Leave commented unless you actually need it.
+# CookieAuthFileGroupReadable 1
+# CookieAuthFile /run/tor/control.authcookie      # placeholder path — verify on your system
+
+# Option B: password authentication (instead of the cookie above).
+# Generate the hash with:  tor --hash-password 'YOUR-PASSWORD'
+# Then paste the resulting 16:... hash below. The hash shown here is a
+# PLACEHOLDER and authenticates nothing — replace it.
+# HashedControlPassword 16:REPLACE_WITH_OUTPUT_OF_tor_hash_password
+
+# --- SOCKS port ---------------------------------------------------------------
+# Default SOCKS proxy your clients connect to. Bind to loopback only.
+# Remember: resolve hostnames THROUGH this proxy (socks5h:// / --socks5-hostname
+# / torsocks) — see docs/socks5-dns-leak.md.
+SocksPort 9050
+
+# --- Optional: circuit behavior ----------------------------------------------
+# NewCircuitPeriod governs how often Tor considers building fresh circuits. The
+# NEWNYM coalescing floor (~10s) is a compiled constant and is not set here; see
+# docs/newnym-rate-limit.md.
+# NewCircuitPeriod 30

@@ -1,0 +1,22 @@
+---
+# roles/services/defaults/main.yml
+
+services_project_dir: /opt/homelab
+
+# Address the containers publish to. Loopback by default; set to the host's
+# overlay interface address so services are reachable over the tailnet only,
+# never exposed publicly. Placeholder on purpose.
+services_bind_addr: "127.0.0.1"
+
+# Forgejo act_runner registration token — generate in the Forgejo admin UI,
+# then set vault-encrypted in group_vars/all.yml. Empty disables the runner.
+services_runner_token: ""
+
+# Pinned image tags: upgrades are a deliberate git change, not a surprise.
+services_images:
+  forgejo: codeberg.org/forgejo/forgejo:9
+  act_runner: code.forgejo.org/forgejo/runner:6
+  vaultwarden: vaultwarden/server:1.32.5
+  code_server: lscr.io/linuxserver/code-server:4.96.2
+  dozzle: amir20/dozzle:v8.9.1
+  uptime_kuma: louislam/uptime-kuma:1.23.16

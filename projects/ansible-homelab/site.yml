@@ -1,0 +1,25 @@
+---
+# site.yml — entry point for the whole homelab.
+#
+#   ansible-playbook -i inventory.ini site.yml
+#
+# Tags let you converge one layer at a time, e.g.:
+#   ansible-playbook -i inventory.ini site.yml --tags docker,services
+
+- name: Base OS configuration (all hosts)
+  hosts: all
+  become: true
+  roles:
+    - role: base
+      tags: [base]
+    - role: overlay
+      tags: [overlay]
+
+- name: Container host + service stack
+  hosts: stack
+  become: true
+  roles:
+    - role: docker
+      tags: [docker]
+    - role: services
+      tags: [services]
